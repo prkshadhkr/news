@@ -50,6 +50,11 @@ class Board(db.Model):
     name = db.Column(db.Text, nullable=False)
     is_read = db.Column(db.Boolean, default=False)
 
+    #relationships for articles and users
+    articles = db.relationship('Article', backref="boards")
+    users = db.relationship('User', backref="boards")
+ 
+
 
 class Feed(db.Model):
     """feeds table"""
@@ -62,6 +67,10 @@ class Feed(db.Model):
     source_id = db.Column(db.Text, 
                         db.ForeignKey('sources.id', ondelete="cascade"))
     name = db.Column(db.Text, nullable=False)
+
+    #relationships for sources and users
+    sources = db.relationship('Source', backref="feeds")
+    users = db.relationship('User', backref="feeds")
  
 
 class Source(db.Model):
@@ -87,6 +96,7 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False, unique=True)
     email = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
+    country = db.Column(db.Text, nullable=False, default="us")
 
     #through relationships between users and articles via boards and users and sources via feeds
     articles = db.relationship(
