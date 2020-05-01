@@ -1,0 +1,21 @@
+{% extends 'base.html' %} {% block title %} Home Page {% endblock %} {% block content %}
+<h1>Testing</h1>
+<ul>
+    {% for data in news %}
+
+    <li>
+        <div class="card-contents">
+            <a href="{{data['url']}}"><b>{{ data['title'] }}</b></a><br>
+            <p>
+                {{ data['description'] }}<br>
+            </p>
+            <!-- <img src="{{ data['urlToImage'] }}" alt="Image for {{ data['title'] }}" class="card-image"><br> -->
+            <p>{{ data['content']}}</p>
+        </div>
+
+    </li>
+
+
+    {% endfor %}
+</ul>
+{% endblock %}
