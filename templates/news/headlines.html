@@ -1,5 +1,15 @@
-{% extends 'base.html' %} {% block title %} Home Page {% endblock %} {% block content %}
+{% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
 <h1>Headlines</h1>
+
+<form action="/headlines" method="POST">
+    <label for="country">Choose a country:</label>
+    <select id="country" name="country">
+      {% for country in countries %}
+        <option value="{{ country }}">{{ country }}</option>
+        {% endfor %}
+    </select>
+    <input type="submit">
+  </form>
 
 <div class="class-list">
     {% for data in news %}

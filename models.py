@@ -27,7 +27,8 @@ class Article(db.Model):
     __tablename__ = 'articles'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    source_name = db.Column(db.Text, nullable=False)
+    source_id = db.Column(db.Text, 
+                        db.ForeignKey('sources.id', ondelete="cascade"))
     author = db.Column(db.Text, nullable=False)
     title = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
@@ -35,6 +36,10 @@ class Article(db.Model):
     img_url = db.Column(db.Text, nullable=False)
     published_at = db.Column(db.Text, nullable=False)
     content = db.Column(db.Text, nullable=False)
+
+    #relationship between articles and sources
+    source = db.relationship(
+        'Source', backref="articles")
 
 
 class Board(db.Model):
@@ -96,7 +101,7 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=False, unique=True)
     email = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
-    country = db.Column(db.Text, nullable=False, default="us")
+    country = db.Column(db.Text, default="us")
 
     #through relationships between users and articles via boards and users and sources via feeds
     articles = db.relationship(
@@ -106,7 +111,7 @@ class User(db.Model):
 
 
     @classmethod
-    def signup(cls, username, email, password):
+    def signup(cls, username, email, password, country):
         """Sign up user.
 
         Hashes password and adds user to system.
@@ -117,7 +122,8 @@ class User(db.Model):
         user = User(
             username=username,
             email=email,
-            password=hashed_pwd
+            password=hashed_pwd,
+            country=country
         )
 
         db.session.add(user)
