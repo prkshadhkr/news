@@ -10,7 +10,7 @@ COUNTRIES = ["","ae", "ar", "at", "au", "be", "bg", "br", "ca", "ch", "cn",
             "ua", "us", "ve", "za"]
 
 
-class SignupForm(FlaskForm):
+class UserEditForm(FlaskForm):
     """Form for editing users."""
 
     username = StringField('Username', validators=[DataRequired()])
@@ -24,3 +24,9 @@ class LoginForm(FlaskForm):
 
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[Length(min=6)])
+
+class AddForm(FlaskForm):
+    """Form for adding/editing boards."""
+
+    name = StringField('name', validators=[DataRequired()])
+

@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
-<h1>Categories</h1>
+<h1>Headlines</h1>
 
-<form action="/categories" method="GET">
+<form action="/headlines" method="POST">
     <div class="row">
         <div class="col-sm-1.5">
             <label for="country">Choose a country:</label>
@@ -14,18 +14,6 @@
                   {% endfor %}
               </select>
         </div>
-        <div class="col-sm-1.5">
-            <label for="category">Choose a category:</label>
-        </div>
-
-        <div class="col-sm-2">
-            <select id="category" name="category" class="form-control">
-                {% for category in categories %}
-                  <option value="{{ category }}">{{ category }}</option>
-                  {% endfor %}
-              </select>
-        </div>
-
         <div class="col-sm-2">
             <input type="submit" class="form-control btn btn-outline-primary">
         </div>
@@ -44,8 +32,8 @@
         <p class="mb-1">{{ data['description'] }}</p>
         <small class="text-muted">{{ data['author'] }}</small>
         <!-- <img src="{{ data['urlToImage'] }}" alt="Image for {{ data['title'] }}" class="card-image"><br> -->
-    </a>
 
+    </a>
     {% endfor %}
 </div>
 

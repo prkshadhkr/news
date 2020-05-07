@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
+<h1>News Sources</h1>
+
+<div class="row">
+
+    {% for source in sources %}
+
+    <div class="col-sm-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ source['name']}}</h5>
+                <p class="card-text">{{ source['description']}}</p>
+                <a href="{{ source['url']}}" class="btn btn-outline-info">{{ source['name']}}</a> 
+                {% if g.user %}
+                    <button data-toggle="popover" data-placement="bottom" data-trigger="tooltip">+F</button>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>
+
+<div id="popover-content" style="display: none">
+    <ul class="list-group custom-popover">
+
+        {% for feed in feeds %}
+        <li class="list-group-item">{{feed['name']}}</li>
+        
+        {% endfor %}
+    </ul>
+</div>
+
+
+{% endblock %}

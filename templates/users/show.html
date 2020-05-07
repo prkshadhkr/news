@@ -1,0 +1,33 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="row justify-content-lg-center">
+    <h2>{{ user.username }}'s profile</h2>
+</div>
+
+<div class="container">
+    <div class="row justify-content-lg-center">
+        <div class="col col-lg-2">
+            <h5>User name:</h5>
+        </div>
+        <div class="col col-lg-2">
+            <h5>{{ user.username}}</h5>
+        </div>
+    </div>
+    <div class="row justify-content-md-center">
+        <div class="col col-lg-2">
+            <h5>Email:</h5>
+        </div>
+        <div class="col col-lg-2">
+            <h5>{{ user.email}}</h5>
+        </div>
+    </div>
+    <div class="row justify-content-md-center">
+        <div class="col col-lg-2">
+            <h5>Country:</h5>
+        </div>
+        <div class="col col-lg-2">
+            <h5>{{ user.country}}</h5>
+        </div>
+    </div>
+</div>
+{% endblock %}

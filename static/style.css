@@ -575,14 +575,14 @@ p.card-bio {
 .sidebar a {
     padding: 8px 8px 8px 32px;
     text-decoration: none;
-    font-size: 25px;
-    color: #818181;
+    font-size: 20px;
+    color: black;
     display: block;
     transition: 0.3s;
 }
 
 .sidebar a:hover {
-    color: #f1f1f1;
+    color: white;
 }
 
 .sidebar .closebtn {
@@ -609,4 +609,24 @@ p.card-bio {
 #main {
     transition: margin-left .5s;
     padding: 16px;
+}
+
+
+/*  ===================== Pop over ========================== */
+
+.popover-title {
+    text-align: center;
+}
+
+.custom-popover li {
+    border: none!important;
+    text-align: center;
+}
+
+.custom-popover li:nth-child(2) {
+    border-top: 1px solid #ccc!important;
+}
+
+.custom-popover li:last-child {
+    border-top: 1px solid #ccc!important;
 }
