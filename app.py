@@ -196,8 +196,6 @@ def page_sources():
                 .query
                 .filter(Feed.user_id == g.user.id)
                 .all())
-        # following will return (feed_id, source_id) tuple
-        # source_feeds = db.session.query(SourceFeed.feed_id, SourceFeed.source_id).all()
 
         return render_template('news/sources.html', sources=sources, feeds=feeds)
 
@@ -300,11 +298,15 @@ def feed_news(id):
         feed_name = id.name
         source_feeds = id.source_feeds
         source =''
-        for source_feed in source_feeds:
-            source += source_feed.source_id+','
+        if len(source_feeds) > 0:
+            for source_feed in source_feeds:
+                source += source_feed.source_id+','
 
-        news = news_headlines_sources(source)
-        return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name)
+            news = news_headlines_sources(source)
+            return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name)
+        else:
+            flash("Please Enter source in Feed", "danger")
+            return redirect('/sources')
     
     if request.method == 'POST':
         data = request.json
@@ -344,17 +346,18 @@ def source_delete(id, name):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    source_id = SourceFeed.query.filter((SourceFeed.feed_id==id) & (SourceFeed.source_id==name)).first()
+    source_id = SourceFeed.query.filter((SourceFeed.feed_id==id) & 
+                                        (SourceFeed.source_id==name)).first()
 
     if source_id.feeds.user_id != g.user.id:
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
-    SourceFeed.query.filter((SourceFeed.feed_id==id) & (SourceFeed.source_id==name)).delete()
+    SourceFeed.query.filter((SourceFeed.feed_id==id) & 
+                            (SourceFeed.source_id==name)).delete()
     db.session.commit()
     
     return redirect(f"/feeds")
-
 
 
 ######################### boards #####################################
@@ -387,7 +390,7 @@ def board_add():
     return render_template('boards/new.html', form=form, boards=boards)
 
 
-@app.route('/boards/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+@app.route('/boards/<int:id>', methods=['GET', 'PATCH', 'POST'])
 def board_news(id):
     
     if not g.user:
@@ -395,15 +398,15 @@ def board_news(id):
         return redirect("/")
 
     if request.method == 'GET':
-        id = Board.query.get_or_404(id)
-        return render_template('news/boards.html', id=id)
+        board = Board.query.get_or_404(id)
+        return render_template('news/boards.html', board=board)
 
     if request.method == 'PATCH':
         
         data = request.json
-        id = data['id']
+        article_id = data['id']
      
-        article = Article.query.get_or_404(id)
+        article = Article.query.get_or_404(article_id)
 
         if article.is_read == False:
             article.is_read = True
@@ -413,17 +416,20 @@ def board_news(id):
         db.session.commit()
         return jsonify(message="updated")
     
-    if request.method == 'DELETE':
+    if request.method == 'POST':
         
-        # data = request.json
-        # id = data['id']
-        # # Article.query.filter_by(id=id[0]).delete()
-        # # article.delete()
-        # # db.session.delete(article)
-        # db.session.commit()
+        data = request.json
+        article_id = data['id']
+        article = Article.query.get_or_404(article_id)
+        
+        ArticleBoard.query.filter((ArticleBoard.board_id==id) & 
+                                    (ArticleBoard.article_id==article.id)).delete()
+        
+        db.session.commit()
+        db.session.delete(article)
+        db.session.commit()
 
-        # return jsonify(message="deleted")
-
+        return jsonify(message="deleted")
 
 
 @app.route('/boards/<int:id>/delete', methods=['POST'])
@@ -435,6 +441,7 @@ def board_delete(id):
         return redirect("/")
 
     board = Board.query.get_or_404(id)
+    articles = board.articles
 
     if board.user_id != g.user.id:
         flash("Access unauthorized.", "danger")
@@ -443,12 +450,14 @@ def board_delete(id):
     ArticleBoard.query.filter(ArticleBoard.board_id == board.id).delete()
     db.session.commit()
 
+    for article in articles:
+        db.session.delete(article)
+        db.session.commit()
+
     db.session.delete(board)
     db.session.commit()
 
     return redirect(f"/boards")
-
-
 
 
 ########################## users #########################################

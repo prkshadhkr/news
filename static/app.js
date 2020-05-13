@@ -105,9 +105,6 @@ $(document).ready(function() {
 /************ articles read  *************/
 
 $('.submit-read').click(readArticle)
-$('.submit-delete').click(deleteArticle)
-
-
 async function readArticle() {
 
     let id = $(this).data('id');
@@ -126,14 +123,13 @@ async function readArticle() {
 
 }
 
-
+$('.submit-delete').click(deleteArticle)
 async function deleteArticle() {
 
     let id = $(this).data('id');
-    // let title = $(this).siblings('#title').val();
     let currentURL = $(location).attr('href');
 
-    await axios.delete(`${currentURL}`, {
+    await axios.post(`${currentURL}`, {
             id: id
         })
         .then(function(response) {
@@ -142,4 +138,8 @@ async function deleteArticle() {
         .catch(function(error) {
             console.log(error);
         });
+
+    // $(this).parent().parent().parent().remove()
+    $(this).parents().eq(3).remove()
+
 }
