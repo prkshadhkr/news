@@ -1,5 +1,8 @@
 {% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
-<h1>News Sources</h1>
+
+<div class="content">
+    <h4>News Sources</h4>
+</div>
 
 <div class="row">
 
@@ -10,28 +13,31 @@
             <div class="card-body">
                 <h5 class="card-title">{{ source['name']}}</h5>
                 <p class="card-text">{{ source['description']}}</p>
-                <a href="{{ source['url']}}" class="btn btn-outline-info">{{ source['name']}}</a> 
-                {% if g.user %}
-                    <button data-toggle="popover" data-placement="bottom" data-trigger="tooltip">+F</button>
+                <a href="{{ source['url']}}" class="btn btn-outline-success">{{ source['name']}}</a> {% if g.user %}
+                <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
+                    <h6>Add to Feed</h6>
+                    <form class='feed-form'>
+                        <input type='hidden' id='source_id' value='{{ source['id']}}'>                       
+                        <label for='feed_id'></label>
+                        <select id='feed_id'class='custom-select' multiple>
+                            {% for feed in feeds %}
+                                <option value='{{feed['id']}}'>{{feed['name']}}</option>
+                            {% endfor %}
+                        </select>
+                        <p></p>
+                        <div align='center'>
+                            <button class='submit-feed btn btn-sm btn-outline-success'>Submit</button>
+                        </div>
+                        
+                    </form>">+F
+                </button>
                 {% endif %}
+
             </div>
 
         </div>
+
     </div>
-
     {% endfor %}
-
 </div>
-
-<div id="popover-content" style="display: none">
-    <ul class="list-group custom-popover">
-
-        {% for feed in feeds %}
-        <li class="list-group-item">{{feed['name']}}</li>
-        
-        {% endfor %}
-    </ul>
-</div>
-
-
 {% endblock %}

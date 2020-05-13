@@ -1,23 +1,17 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField
 from wtforms.validators import DataRequired, Email, Length
+from constants import COUNTRIES, CATEGORIES
 
-COUNTRIES = ["","ae", "ar", "at", "au", "be", "bg", "br", "ca", "ch", "cn",
-            "co", "cu", "cz", "de", "eg", "fr", "gb", "gr", "hk", "hu",
-            "id", "ie", "il", "in", "it", "jp", "kr", "lt", "lv", "ma", 
-            "mx", "my", "ng", "nl", "no", "nz", "ph", "pl", "pt", "ro", 
-            "rs", "ru", "sa", "se", "sg", "si", "sk", "th","tr", "tw", 
-            "ua", "us", "ve", "za"]
 
 
 class UserEditForm(FlaskForm):
     """Form for editing users."""
-
+	
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('E-mail', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[Length(min=6)])
-    country = SelectField('Country', choices=[(country, country) for country in COUNTRIES])
-
+    country = SelectField('Country', choices=COUNTRIES)
 
 class LoginForm(FlaskForm):
     """Login form."""
@@ -26,7 +20,17 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[Length(min=6)])
 
 class AddForm(FlaskForm):
-    """Form for adding/editing boards."""
+    """Form for adding/editing boards and feeds"""
 
     name = StringField('name', validators=[DataRequired()])
 
+class CountryForm(FlaskForm):
+    """Form for selecting country."""
+
+    country = SelectField('Country', choices=COUNTRIES)
+
+class CategoryByCountry(FlaskForm):
+    """Form for selecting category by country"""
+
+    country = SelectField('Country', choices=COUNTRIES)
+    category = SelectField('Category', choices=CATEGORIES)

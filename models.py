@@ -27,21 +27,32 @@ class Article(db.Model):
     __tablename__ = 'articles'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    source_id = db.Column(db.Text, 
-                        db.ForeignKey('sources.id', ondelete="cascade"))
-    author = db.Column(db.Text, nullable=False)
+    source_id = db.Column(db.Text)
+    author = db.Column(db.Text)
     title = db.Column(db.Text, nullable=False)
     description = db.Column(db.Text, nullable=False)
     url = db.Column(db.Text, nullable=False)
-    img_url = db.Column(db.Text, nullable=False)
-    published_at = db.Column(db.Text, nullable=False)
-    content = db.Column(db.Text, nullable=False)
+    img_url = db.Column(db.Text)
+    published_at = db.Column(db.Text)
+    content = db.Column(db.Text)
+    is_read = db.Column(db.Boolean, default=False)
 
-    #relationship between articles and sources
-    source = db.relationship(
-        'Source', backref="articles")
+    #relationships for article_boards
+    article_boards = db.relationship('ArticleBoard', backref="articles")
 
 
+class ArticleBoard(db.Model):
+    """article_boards table"""
+
+    __tablename__ = 'article_boards'
+
+    id = db.Column(db.Integer, primary_key=True)
+    article_id = db.Column(db.Integer, 
+                        db.ForeignKey('articles.id', ondelete="cascade"), nullable=False)
+    board_id = db.Column(db.Integer, 
+                        db.ForeignKey('boards.id', ondelete="cascade"), nullable=False)
+
+ 
 class Board(db.Model):
     """boards table"""
 
@@ -49,16 +60,16 @@ class Board(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, 
-                        db.ForeignKey('users.id', ondelete="cascade"))
-    article_id = db.Column(db.Integer, 
-                        db.ForeignKey('articles.id', ondelete="cascade"))
+                        db.ForeignKey('users.id', ondelete="cascade"), nullable=False)
     name = db.Column(db.Text, nullable=False)
-    is_read = db.Column(db.Boolean, default=False)
 
-    #relationships for articles and users
-    articles = db.relationship('Article', backref="boards")
-    users = db.relationship('User', backref="boards")
- 
+    #relationships for article_boards
+    article_boards = db.relationship('ArticleBoard', backref="boards", cascade="all, delete-orphan")
+
+    #through relationships for articles
+    articles = db.relationship('Article', 
+                        secondary='article_boards',                         
+                        backref='boards')
 
 
 class Feed(db.Model):
@@ -68,15 +79,39 @@ class Feed(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, 
-                        db.ForeignKey('users.id', ondelete="cascade"))
-    source_id = db.Column(db.Text, 
-                        db.ForeignKey('sources.id', ondelete="cascade"))
+                        db.ForeignKey('users.id', ondelete="cascade"), nullable=False)
     name = db.Column(db.Text, nullable=False)
 
-    #relationships for sources and users
-    sources = db.relationship('Source', backref="feeds")
-    users = db.relationship('User', backref="feeds")
- 
+    #relationships for source_feeds
+    source_feeds = db.relationship('SourceFeed', backref="feeds", cascade="all, delete-orphan") 
+
+    #through relationships for sources
+    sources = db.relationship('Source', 
+                        secondary='source_feeds',                         
+                        backref='feeds')
+
+
+class SourceFeed(db.Model):
+    """source_feeds table"""
+
+    __tablename__ = 'source_feeds'
+
+    id = db.Column(db.Integer, primary_key=True)
+    source_id = db.Column(db.Text,
+                        db.ForeignKey('sources.id', ondelete="cascade"), nullable=False)
+    feed_id = db.Column(db.Integer, 
+                        db.ForeignKey('feeds.id', ondelete="cascade"), nullable=False)
+
+    # not sure if we are going to use following
+    def to_serialize(self):
+        """Serialize sourcefeed."""
+
+        return {
+            "id": self.id,
+            "source_id": self.source_id,
+            "feed_id": self.feed_id
+        }
+
 
 class Source(db.Model):
     """sources table"""
@@ -91,6 +126,12 @@ class Source(db.Model):
     language = db.Column(db.Text, nullable=False)
     country = db.Column(db.Text, nullable=False)
 
+    #relationships for source_feeds
+    source_feeds = db.relationship('SourceFeed', backref="sources")
+
+    #relationship with articles
+    # articles = db.relationship('Article', backref="source")
+
 
 class User(db.Model):
     """users table"""
@@ -103,12 +144,11 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     country = db.Column(db.Text, default="us")
 
-    #through relationships between users and articles via boards and users and sources via feeds
-    articles = db.relationship(
-        'Article', secondary="boards", backref="users")
-    sources = db.relationship(
-        'Source', secondary="feeds", backref="users")
+    #relationships for feeds
+    feeds = db.relationship('Feed', backref="users", cascade="all, delete-orphan")
 
+    #relationships for boards
+    boards = db.relationship('Board', backref="users", cascade="all, delete-orphan")
 
     @classmethod
     def signup(cls, username, email, password, country):
@@ -116,7 +156,7 @@ class User(db.Model):
 
         Hashes password and adds user to system.
         """
-
+        
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
 
         user = User(
@@ -128,8 +168,6 @@ class User(db.Model):
 
         db.session.add(user)
         return user
-
-
 
     @classmethod
     def authenticate(cls, username, password):

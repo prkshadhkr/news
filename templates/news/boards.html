@@ -1,0 +1,48 @@
+{% extends 'base.html' %} {% block title %} Feeds {% endblock %} {% block content %}
+
+<div class="content">
+    <h4>{{ id.name }} - headlines</h4>
+</div>
+
+{% for data in id.articles %}
+<ul class="list-unstyled">
+    <li class="media">
+        <a href="{{data['url']}}">
+            <img src="{{ data['img_url'] }}" class="rounded d-flex mr-3" alt="...">
+        </a>
+
+        <div class="media-body">
+            <div class="mt-0 font-weight-bold">
+                <a href="{{data['url']}}">
+                    <h6>{{ data['title'] }}</h6>
+                </a>
+                <small class="text-muted">{{ data['published_at'] }}</small>
+            </div>
+            <p>{{ data['description'] }}</p>
+            <small class="text-muted">{{ data['author'] }}</small>
+        </div>
+
+        <span>
+            
+            <div class="col-sm-2">
+               
+                <form class="article-update">
+                    <!-- <input type="hidden" id="title" value="{{ data['title'] }}">  -->
+                    <button data-id="{{ data.id }}" class="submit-read btn btn-sm btn-outline-secondary">
+                        {% if data['is_read'] == True %}
+                            ✔
+                         {% else %}
+                            ✘
+                        {% endif %}
+                      </button>
+                </form>
+            </div>
+        </span>
+        <span>
+            <div class="col-sm-2">
+                <button data-id="{{ data.id }}" class="submit-delete btn btn-sm btn-outline-danger">delete</button>
+            </div>
+        </span>
+    </li>
+</ul>
+{% endfor %} {% endblock %}

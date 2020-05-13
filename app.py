@@ -1,30 +1,29 @@
 # import os
-from flask import Flask, render_template, request, flash, redirect, session, g, abort
+from flask import Flask, render_template, request, flash, redirect, session, g, abort, jsonify
+from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 
-from forms import UserEditForm, LoginForm, AddForm, COUNTRIES
-from models import db, connect_db, Article, Board, Feed, Source, User
+from forms import UserEditForm, LoginForm, AddForm, CountryForm, CategoryByCountry
+from models import db, connect_db, Article, Board, Feed, Source, User, SourceFeed, ArticleBoard
 
 from secrets import API_KEY
-import requests
 from datetime import date
+from constants import CATEGORIES, BASE_URL
 
-
+import requests
 
 CURR_USER_KEY = "curr_user"
-BASE_URL = "http://newsapi.org/v2"
-
-CATEGORIES = ["", "business", "entertainment", "general", "health", "science", "sports", "technology"]
 
 app = Flask(__name__)
+CORS(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = (
 #     os.environ.get('DATABASE_URL', 'postgres:///news_db'))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///news_db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
@@ -38,6 +37,13 @@ connect_db(app)
 
 def news_headlines(country):
     url = (f"{BASE_URL}/top-headlines?country={country}&apiKey={API_KEY}")
+    res = requests.get(url)
+    data = res.json()
+    articles = data['articles']
+    return articles
+
+def news_headlines_sources(source):
+    url = (f"{BASE_URL}/top-headlines?sources={source}&apiKey={API_KEY}")
     res = requests.get(url)
     data = res.json()
     articles = data['articles']
@@ -59,7 +65,6 @@ def news_sources():
     return articles
 
 def news_search(search):
-   # url = (f"{BASE_URL}/top-headlines?q={search}&apiKey={API_KEY}")
     url = (f"{BASE_URL}/everything?q={search}&apiKey={API_KEY}")
     res = requests.get(url)
     data = res.json()
@@ -72,6 +77,43 @@ def news_advsearch(search, fdate, tdate):
     data = res.json()
     articles = data['articles']
     return articles
+
+######################### helper functions ##############################
+
+def update_articles(data):
+
+    source_id = data['source_id'] or 'NA'
+    author = data['author']
+    title = data['title'] 
+    description = data['description'] 
+    url = data['url']
+    img_url = data['img_url'] 
+    published_at = data['published_at'] 
+    content = data['content'] 
+
+    boards = data['board_id']
+
+    article = Article(source_id=source_id,
+                        author=author,
+                        title=title,
+                        description=description,
+                        url=url,
+                        img_url=img_url,
+                        published_at=published_at,
+                        content=content)
+        
+    db.session.add(article)
+    db.session.commit()
+        
+    for board in boards:
+        board_id = board
+        article_id = article.id
+
+        article_board = ArticleBoard(board_id=board_id, article_id=article_id)
+        db.session.add(article_board)
+        db.session.commit()
+
+    return
 
 
 
@@ -89,83 +131,132 @@ def page_headlines():
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
-    user = g.user
- 
-    country = request.form.get('country') or g.user.country
-    news = news_headlines(country)
-    
-    boards = (Board
-                .query
-                .filter(Board.user_id == g.user.id).distinct(Board.name)
-                # .limit(20)
-                .all())
+    form = CountryForm()
+    boards = (Board.query
+                    .filter(Board.user_id == g.user.id)
+                    .all())
 
-    return render_template('news/headlines.html', news=news, countries=COUNTRIES, boards=boards)
+    if request.method == 'GET':
+        country = g.user.country
+        news = news_headlines(country)
+        return render_template('news/headlines.html', news=news, form=form, boards=boards)
+
+    if request.method == 'POST' and form.validate():
+        country=form.country.data or g.user.country
+
+        news = news_headlines(country)
+        return render_template('news/headlines.html', news=news, form=form, boards=boards)
+
+    if request.method == 'POST':
+        data = request.json
+        update_articles(data)
+
+        return jsonify(message="added")
 
 
-@app.route('/categories', methods=['GET'])
+@app.route('/categories', methods=['GET', 'POST'])
 def page_categories():
     
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
-    country = request.args.get("country")or g.user.country
-    category = request.args.get("category") 
+    form = CategoryByCountry()
+    boards = (Board.query
+                    .filter(Board.user_id == g.user.id)
+                    .all())
+
+    if request.method == 'GET':
+        return render_template('news/categories.html', form=form)
+
+    if request.method == 'POST' and form.validate():
+        country = form.country.data
+        category = form.category.data 
+
+        news = news_categories(country, category)
+        return render_template('news/categories.html', form=form, news=news, boards=boards)
+
+    if request.method == 'POST':
+        data = request.json
+        update_articles(data)
+
+        return jsonify(message="added")
+
     
-    news = news_categories(country, category)
-
-    return render_template('news/categories.html',countries=COUNTRIES, categories=CATEGORIES, news=news)
-
-
-@app.route('/sources', methods=['GET'])
+@app.route('/sources', methods=['GET', 'POST'])
 def page_sources():
     
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
-    sources = Source.query.all()
-    feeds = (Feed
+    if request.method == 'GET':
+        sources = Source.query.all()
+        feeds = (Feed
                 .query
-                .filter(Feed.user_id == g.user.id).distinct(Feed.name)
+                .filter(Feed.user_id == g.user.id)
                 .all())
-   
-    return render_template('news/sources.html', sources=sources, feeds=feeds)
+        # following will return (feed_id, source_id) tuple
+        # source_feeds = db.session.query(SourceFeed.feed_id, SourceFeed.source_id).all()
+
+        return render_template('news/sources.html', sources=sources, feeds=feeds)
+
+    elif request.method == "POST":
+        
+        data = request.json
+        source_id = data['source_id']
+        feeds = data['feed_id']
+
+        for feed in feeds:
+            feed_id = feed
+            source_id = source_id
+
+            source_feed = SourceFeed(source_id=source_id, feed_id=feed_id)
+            db.session.add(source_feed)
+            db.session.commit()
+        
+        return jsonify(message="added")
 
 
-@app.route('/search', methods=['GET'])
+
+@app.route('/search', methods=['GET', 'POST'])
 def page_search():
     
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
-    search = request.args.get('q')
-    news = news_search(search)
+    boards = (Board.query
+                    .filter(Board.user_id == g.user.id)
+                    .all())
 
-    return render_template('news/everything.html', news=news, countries=COUNTRIES)
+    if request.method == 'GET':
+        return render_template('news/search.html')
 
+    if request.method == 'POST' and request.form.get("btn-search") == "general":
+        search = request.form.get('q') or None
+        news = news_search(search)
 
-@app.route('/search/date', methods=['GET'])
-def page_advsearch():
-    
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/login")
+        return render_template('news/search.html', news=news, boards=boards)
 
-    search = request.args.get("q")
-    from_date = request.args.get("fromDate") or None
-    to_date = request.args.get("toDate") or date.today()
+    if request.method == 'POST' and request.form.get("btn-search") == "date-base":
+        search = request.form.get("q") or None
+        from_date = request.form.get("fromDate") or None
+        to_date = request.form.get("toDate") or date.today()
+        news = news_advsearch(search, from_date, to_date)
 
-    news = news_advsearch(search, from_date, to_date)
+        return render_template('news/search.html', news=news, boards=boards)
 
-    return render_template('news/advsearch.html', news=news)
+    if request.method == 'POST':
+        data = request.json
+        update_articles(data)
+
+        return jsonify(message="added")
+
 
 ######################### Feeds #####################################
 
-
-@app.route('/feeds/new', methods=["GET", "POST"])
+@app.route('/feeds', methods=["GET", "POST"])
 def feed_add():
     """Add a feed:
     """
@@ -187,37 +278,89 @@ def feed_add():
 
     feeds = (Feed
                 .query
-                .filter(Feed.user_id == g.user.id).distinct(Feed.name)
+                .filter(Feed.user_id == g.user.id)
                 .all())
+
     return render_template('feeds/new.html', form=form, feeds=feeds)
 
 
-# @app.route('/feeds/<name>', methods=['GET', 'POST'])
-# def page_feed(name):
+@app.route('/feeds/<int:id>', methods=['GET', 'POST'])
+def feed_news(id):
     
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/login")
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
 
-#     user = g.user
- 
-#     country = request.form.get('country') or g.user.country
-#     news = news_headlines(country)
+    boards = (Board.query
+                    .filter(Board.user_id == g.user.id)
+                    .all())
+
+    if request.method == 'GET':
+        id = Feed.query.get_or_404(id)
+        feed_name = id.name
+        source_feeds = id.source_feeds
+        source =''
+        for source_feed in source_feeds:
+            source += source_feed.source_id+','
+
+        news = news_headlines_sources(source)
+        return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name)
     
-#     feeds = (Feed
-#                 .query
-#                 .filter(Feed.user_id == g.user.id).distinct(Feed.name)
-#                 # .limit(20)
-#                 .all())
+    if request.method == 'POST':
+        data = request.json
+        update_articles(data)
 
-#     return render_template('news/headlines.html', news=news, countries=COUNTRIES, boards=boards)
+        return jsonify(message="added")
 
 
-######################### Boards #####################################
+@app.route('/feeds/<int:id>/delete', methods=["POST"])
+def feed_ddelete(id):
+    """Delete a message."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    feed = Feed.query.get_or_404(id)
+
+    if feed.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    SourceFeed.query.filter(SourceFeed.feed_id == feed.id).delete()
+    db.session.commit()
+
+    db.session.delete(feed)
+    db.session.commit()
+
+    return redirect(f"/feeds")
 
 
-@app.route('/boards/new', methods=["GET", "POST"])
-def boards_add():
+@app.route('/feeds/<int:id>/<name>/delete', methods=["POST"])
+def source_delete(id, name):
+    """Delete a message."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    source_id = SourceFeed.query.filter((SourceFeed.feed_id==id) & (SourceFeed.source_id==name)).first()
+
+    if source_id.feeds.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    SourceFeed.query.filter((SourceFeed.feed_id==id) & (SourceFeed.source_id==name)).delete()
+    db.session.commit()
+    
+    return redirect(f"/feeds")
+
+
+
+######################### boards #####################################
+
+@app.route('/boards', methods=["GET", "POST"])
+def board_add():
     """Add a board:
     """
 
@@ -230,15 +373,6 @@ def boards_add():
     if form.validate_on_submit():
         name=form.name.data  
 
-        # u_id = g.user.id
-
-        # exists = Board.query.filter((Board.user_id==u_id) & (Board.name==name)) is not None
-        
-        # if exists:   
-        #     flash("Board already exists", "danger")
-        #     return redirect('/boards/new')
-
-    
         board = Board(name=name)
         g.user.boards.append(board)
         db.session.commit()
@@ -247,11 +381,72 @@ def boards_add():
 
     boards = (Board
                 .query
-                .filter(Board.user_id == g.user.id).distinct(Board.name)
-                # .limit(20)
+                .filter(Board.user_id == g.user.id)
                 .all())
+
     return render_template('boards/new.html', form=form, boards=boards)
 
+
+@app.route('/boards/<int:id>', methods=['GET', 'PATCH', 'DELETE'])
+def board_news(id):
+    
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    if request.method == 'GET':
+        id = Board.query.get_or_404(id)
+        return render_template('news/boards.html', id=id)
+
+    if request.method == 'PATCH':
+        
+        data = request.json
+        id = data['id']
+     
+        article = Article.query.get_or_404(id)
+
+        if article.is_read == False:
+            article.is_read = True
+        elif article.is_read == True:
+            article.is_read = False
+
+        db.session.commit()
+        return jsonify(message="updated")
+    
+    if request.method == 'DELETE':
+        
+        # data = request.json
+        # id = data['id']
+        # # Article.query.filter_by(id=id[0]).delete()
+        # # article.delete()
+        # # db.session.delete(article)
+        # db.session.commit()
+
+        # return jsonify(message="deleted")
+
+
+
+@app.route('/boards/<int:id>/delete', methods=['POST'])
+def board_delete(id):
+    """Delete a message."""
+
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    board = Board.query.get_or_404(id)
+
+    if board.user_id != g.user.id:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    ArticleBoard.query.filter(ArticleBoard.board_id == board.id).delete()
+    db.session.commit()
+
+    db.session.delete(board)
+    db.session.commit()
+
+    return redirect(f"/boards")
 
 
 
@@ -286,7 +481,7 @@ def edit_profile():
         if User.authenticate(user.username, form.password.data):
             user.username = form.username.data
             user.email = form.email.data
-            user.country= form.country.data
+            user.country= form.country.data or None
             db.session.commit()
             return redirect(f"/users/{user.id}")
 
@@ -404,3 +599,10 @@ def logout():
 
     flash("You have successfully logged out.", 'success')
     return redirect("/")
+
+
+####################### contact ###################
+
+@app.route('/contact')
+def page_contact():
+    return render_template("contact.html")

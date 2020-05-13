@@ -14,24 +14,60 @@
         </form>
     </div>
 </div>
-
+<br>
 <div class="row justify-content-center">
-    <h2>Feeds</h2>
+    <h4>Feeds</h4>
 </div>
+<br> {% if g.user %}
 <div class="row justify-content-center">
 
     <div class="col-sm-4">
-        <ul class="list-group" id="boards">
+        <ul class="list-group">
 
             {% for feed in feeds %}
+            <li class="row">
+                <div class="col-sm-6">
+                    <h5>
+                        <a href="/feeds/{{ feed.id }}" class="feed-link"> {{feed.name}} </a>
+                    </h5>
+                </div>
+                <br>
 
-            <li class="list-group-item">
-                <a href="/feeds/{{ feed.name }}" class="feed-link"> {{feed.name}} </a>
+                <div class="col-sm-2">
+                    <form method="POST" action="/feeds/{{ feed.id }}/delete">
+                        <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </div>
+                <br>
             </li>
-            {% endfor %}
+            <div class="row justify-content-center"></div>
+            <div class="col-sm-8">
+                <ul class="list-group">
 
+                    {% for source in feed.sources %}
+
+                    <li class="row">
+                        <div class="col-sm-6">
+                            <h6>
+                                {{ source.name }}
+                            </h6>
+                        </div>
+                        <div class="col-sm-1">
+                            <form method="POST" action="/feeds/{{ feed.id }}/{{ source.id }}/delete">
+                                <button class="btn btn-sm btn-outline-danger">X</button>
+                            </form>
+                        </div>
+                    </li>
+
+                    {% endfor %}
+
+                </ul>
+            </div>
+
+            {% endfor %}
         </ul>
     </div>
 </div>
 
-{% endblock %}
+</div>
+{% endif %} {% endblock %}

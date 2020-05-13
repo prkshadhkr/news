@@ -82,8 +82,8 @@ class UserModelTestCase(TestCase):
         self.assertEqual(len(u.feeds), 0)
 
         # User should have no sources & no articles
-        self.assertEqual(len(u.sources), 0)
-        self.assertEqual(len(u.articles), 0)
+        self.assertEqual(len(u.source_feeds), 0)
+        self.assertEqual(len(u.article_boards), 0)
 
     ####
     #

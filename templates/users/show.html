@@ -1,8 +1,9 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="row justify-content-lg-center">
-    <h2>{{ user.username }}'s profile</h2>
+    <h4>{{ user.username }}'s profile</h4>
 </div>
+<br>
 
 <div class="container">
     <div class="row justify-content-lg-center">
@@ -29,5 +30,9 @@
             <h5>{{ user.country}}</h5>
         </div>
     </div>
+    <br>
+    <Form action="/users/delete" method="POST" class="row justify-content-md-center">
+        <button type="submit" class='btn btn-md btn-outline-danger'>Delete User</button>
+    </Form>
 </div>
 {% endblock %}

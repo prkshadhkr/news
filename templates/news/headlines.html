@@ -1,18 +1,16 @@
 {% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
-<h1>Headlines</h1>
+
+<div class="content">
+    <h4>Headlines</h4>
+</div>
 
 <form action="/headlines" method="POST">
     <div class="row">
-        <div class="col-sm-1.5">
-            <label for="country">Choose a country:</label>
-        </div>
-
         <div class="col-sm-2">
-            <select id="country" name="country" class="form-control">
-                {% for country in countries %}
-                  <option value="{{ country }}">{{ country }}</option>
-                  {% endfor %}
-              </select>
+
+            {{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span> {% endfor %} {{ field(placeholder=field.label.text, class="form-control") }} {% endfor %}
+
         </div>
         <div class="col-sm-2">
             <input type="submit" class="form-control btn btn-outline-primary">
@@ -21,65 +19,4 @@
     </div>
 
 </form>
-
-{% for data in news %}
-<div class="class-list">
-    <input type="hidden" name="source_id" id="source_id" value="{{ data['source']['id']}}">
-    <input type="hidden" name="title" id="title" value="{{ data['title']}}">
-    <input type="hidden" name="url" id="url" value="{{ data['url']}}">
-    <input type="hidden" name="author" id="author" value="{{ data['author']}}">
-
-    <a href="{{data['url']}}" class="list-group-item list-group-item-action">
-        <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">{{ data['title'] }}</h5>
-            <small class="text-muted">{{ data['publishedAt'] }}</small>
-        </div>
-        <p class="mb-1">{{ data['description'] }}</p>
-        <small class="text-muted">{{ data['author'] }}</small>
-    </a>
-</div>
-
-{% if g.user %}
-<div class="form-group">
-    <button data-toggle="popover" data-placement="bottom" data-trigger="tooltip">+B</button>
-</div>
-{% endif %} {% endfor %}
-
-
-<!-- <div class="well">
-    <button type="button" id="login" class="btn">Login sign up Form</button>
-</div>
-<div id="myForm" class="hide">
-    <form action="/echo/html/" id="popForm" method="get">
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" name="email" id="email" class="form-control input-md">
-            <label for="name">Name:</label>
-            <input type="text" name="name" id="name" class="form-control input-md">
-            <label for="denger">Gender:</label>
-            <select name="gender" id="gender" class="form-control input-md"><option value="male">Male</option><option value="female">Female</option></select>
-            <label for="about">About Me:</label>
-            <textarea rows="3" name="about" id="about" class="form-control input-md"></textarea>
-            <button type="button" class="btn btn-primary" data-loading-text="Sending info.."><em class="icon-ok"></em> Save</button>
-        </div>
-    </form>
-</div>
-<div id="result"></div> -->
-
-
-
-<!-- loaded popover content -->
-<div id="popover-content" style="display: none">
-    <ul class="list-group custom-popover">
-
-        {% for board in boards %}
-        <li class="list-group-item">{{board['name']}}</li>
-
-        {% endfor %}
-    </ul>
-
-
-</div>
-
-
-{% endblock %}
+{% include "_articles.html" %} {% endblock %}

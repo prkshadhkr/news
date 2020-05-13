@@ -1,3 +1,4 @@
+
 """Feed and Board model tests."""
 
 # run these tests like:
@@ -27,6 +28,7 @@ from app import app
 # and create fresh new clean test data
 
 db.create_all()
+
 
 
 class FeedBoardModelTestCase(TestCase):
