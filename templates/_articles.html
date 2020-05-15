@@ -1,13 +1,14 @@
-{% for data in news %}
+ {% for data in news %}
+
 <ul class="list-unstyled">
     <li class="media">
-        <a href="{{data['url']}}">
-            <img src="{{ data['urlToImage'] }}" class="rounded d-flex mr-3" alt="...">
+        <a href="{{data['url']}}" target="_blank">
+            <img src="{{ data['urlToImage'] }}" class="rounded d-flex mr-3" alt="..." target="_blank">
         </a>
 
         <div class="media-body">
             <div class="mt-0 font-weight-bold">
-                <a href="{{data['url']}}">
+                <a href="{{data['url']}}" target="_blank">
                     <h6>{{ data['title'] }}</h6>
                 </a>
                 <small class="text-muted">{{ data['publishedAt'] }}</small>
@@ -17,8 +18,8 @@
         </div>
         <span class="">
           <div class="col-sm-2">
-              <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
-                  <h6>Add to Board</h6>
+                <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
+                <h6>Add to Board</h6>
                   <form class='board-form'>
                       <input type='hidden' id='url' value='{{ data['url'] }}'>
                       <input type='hidden' id='source_id' value='{{ data['source']['id'] }}'> 
@@ -31,7 +32,15 @@
                       <label for='board_id'></label>
                       <select id='board_id'class='custom-select' multiple>
                           {% for board in boards %}
-                              <option value='{{board['id']}}'>{{board['name']}}</option>
+
+                              <option value='{{board['id']}}' 
+                              {% if (board['id'], data['url']) not in article_boards %}
+                                  enabled
+                              {% else %}
+                                  disabled style='background-color:yellow'
+                              {% endif %}
+                              >{{board['name']}}</option>
+
                           {% endfor %}
                       </select>
                       <p></p>
@@ -39,10 +48,12 @@
                           <button class='submit-board btn btn-sm btn-outline-success'>Submit</button>
                       </div>
                       
-                  </form>">+B
+                  </form>
+                ">+B
               </button>
           </div>
       </span>
     </li>
 </ul>
+
 {% endfor %}

@@ -4,7 +4,9 @@
 
   <div class="row justify-content-md-center">
     <div class="col-md-4">
-      <h4 class="join-message">Edit Your Profile.</h4>
+      <div class="text-center">
+        <h4>Edit Your Profile.</h4>
+      </div>
       <form method="POST" id="user_form">
         {{ form.hidden_tag() }}
 
@@ -25,7 +27,7 @@
         {% endif %}
         {{ form.password(placeholder="Enter your password to confirm", class="form-control") }}
 
-        <div class="edit-btn-area">
+        <div class="edit-btn-area text-center">
           <button class="btn btn-outline-success">Edit this user!</button>
           <a href="/users/{{ user_id }}" class="btn btn-outline-secondary">Cancel</a>
         </div>

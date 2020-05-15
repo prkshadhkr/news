@@ -35,7 +35,6 @@ class Article(db.Model):
     img_url = db.Column(db.Text)
     published_at = db.Column(db.Text)
     content = db.Column(db.Text)
-    is_read = db.Column(db.Boolean, default=False)
 
     #relationships for article_boards
     article_boards = db.relationship('ArticleBoard', backref="articles")
@@ -51,6 +50,7 @@ class ArticleBoard(db.Model):
                         db.ForeignKey('articles.id', ondelete="cascade"), nullable=False)
     board_id = db.Column(db.Integer, 
                         db.ForeignKey('boards.id', ondelete="cascade"), nullable=False)
+    is_read = db.Column(db.Boolean, default=False)
 
  
 class Board(db.Model):

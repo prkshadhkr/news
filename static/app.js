@@ -52,7 +52,7 @@ $(document).ready(function() {
                 feed_id: feedId
             })
             .then(function(response) {
-                console.log(response);
+                location.reload();
             })
             .catch(function(error) {
                 console.log(error);
@@ -92,6 +92,10 @@ $(document).ready(function() {
                 board_id: boardId
             })
             .then(function(response) {
+
+                // $(".col-sm-2").load(".col-sm-2 > *");
+                location.reload();
+
                 console.log(response);
             })
             .catch(function(error) {
@@ -105,16 +109,18 @@ $(document).ready(function() {
 /************ articles read  *************/
 
 $('.submit-read').click(readArticle)
-async function readArticle() {
-
+async function readArticle(e) {
+    e.preventDefault()
     let id = $(this).data('id');
     // let title = $(this).siblings('#title').val();
     let currentURL = $(location).attr('href');
+    console.log('id :', id)
 
     await axios.patch(`${currentURL}`, {
             id: id
         })
         .then(function(response) {
+            location.reload()
             console.log(response);
         })
         .catch(function(error) {

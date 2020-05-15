@@ -1,29 +1,28 @@
-{% extends 'base.html' %} 
-
-{% block title %} Feeds {% endblock %} 
-
-{% block content %}
+{% extends 'base.html' %}
+ {% block title %} Boards {% endblock %} 
+ 
+ {% block content %}
 
 <div class="content">
     <h4>{{ board.name }} - headlines</h4>
 </div>
 
-{% for data in board.articles %}
+{% for data in article_boards %}
 <ul class="list-unstyled">
     <li class="media">
-        <a href="{{data['url']}}">
-            <img src="{{ data['img_url'] }}" class="rounded d-flex mr-3" alt="...">
+        <a href="{{data.articles['url']}}" target="_blank">
+            <img src="{{ data.articles['img_url'] }}" class="rounded d-flex mr-3" alt="..." target="_blank">
         </a>
 
         <div class="media-body">
             <div class="mt-0 font-weight-bold">
-                <a href="{{data['url']}}">
-                    <h6>{{ data['title'] }}</h6>
+                <a href="{{data.articles['url']}}" target="_blank">
+                    <h6>{{ data.articles['title'] }}</h6>
                 </a>
-                <small class="text-muted">{{ data['published_at'] }}</small>
+                <small class="text-muted">{{ data.articles['published_at'] }}</small>
             </div>
-            <p>{{ data['description'] }}</p>
-            <small class="text-muted">{{ data['author'] }}</small>
+            <p>{{ data.articles['description'] }}</p>
+            <small class="text-muted">{{ data.articles['author'] }}</small>
         </div>
 
         <span>
@@ -31,7 +30,7 @@
                
                 <form class="article-update">
                     <!-- <input type="hidden" id="title" value="{{ data['title'] }}">  -->
-                    <button data-id="{{ data.id }}" class="submit-read btn btn-sm btn-outline-secondary">
+                    <button data-id="{{ data.articles['id'] }}" class="submit-read btn btn-sm btn-outline-secondary">
                         {% if data['is_read'] == True %}
                             ✔
                          {% else %}
@@ -43,12 +42,11 @@
         </span>
         <span>
             <div class="col-sm-2">
-                <button data-id="{{ data.id }}" class="submit-delete btn btn-sm btn-outline-danger">
+                <button data-id="{{ data.articles['id'] }}" class="submit-delete btn btn-sm btn-outline-danger">
                     delete
                 </button>
             </div>
         </span>
     </li>
 </ul>
-{% endfor %}
-{% endblock %}
+{% endfor %} {% endblock %}

@@ -1,11 +1,15 @@
-{% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
+{% extends 'base.html' %} 
+
+{% block title %} Categories {% endblock %} 
+
+{% block content %}
 
 <div class="content">
     <h4>Headlines</h4>
 </div>
 
-<form action="/categories" method="POST">
-    <div class="row">
+<form action="/categories" method="POST" id="search-category">
+    <div class="row" >
 
         {{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in field.errors %}
         <span class="text-danger">{{ error }}</span> {% endfor %}

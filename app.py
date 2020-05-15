@@ -6,12 +6,13 @@ from sqlalchemy.exc import IntegrityError
 
 from forms import UserEditForm, LoginForm, AddForm, CountryForm, CategoryByCountry
 from models import db, connect_db, Article, Board, Feed, Source, User, SourceFeed, ArticleBoard
-
-from secrets import API_KEY
 from datetime import date
 from constants import CATEGORIES, BASE_URL
 
 import requests
+
+#### Note: Please get your api key from https://newsapi.org/docs/endpoints/sources ######
+API_KEY = "YOUR API KEY"
 
 CURR_USER_KEY = "curr_user"
 
@@ -130,6 +131,8 @@ def page_headlines():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/login")
+    
+    article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
 
     form = CountryForm()
     boards = (Board.query
@@ -139,13 +142,13 @@ def page_headlines():
     if request.method == 'GET':
         country = g.user.country
         news = news_headlines(country)
-        return render_template('news/headlines.html', news=news, form=form, boards=boards)
+        return render_template('news/headlines.html', news=news, form=form, boards=boards, article_boards=article_boards)
 
     if request.method == 'POST' and form.validate():
         country=form.country.data or g.user.country
 
         news = news_headlines(country)
-        return render_template('news/headlines.html', news=news, form=form, boards=boards)
+        return render_template('news/headlines.html', news=news, form=form, boards=boards, article_boards=article_boards)
 
     if request.method == 'POST':
         data = request.json
@@ -161,6 +164,8 @@ def page_categories():
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
+    article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
+
     form = CategoryByCountry()
     boards = (Board.query
                     .filter(Board.user_id == g.user.id)
@@ -174,7 +179,7 @@ def page_categories():
         category = form.category.data 
 
         news = news_categories(country, category)
-        return render_template('news/categories.html', form=form, news=news, boards=boards)
+        return render_template('news/categories.html', form=form, news=news, boards=boards, article_boards=article_boards)
 
     if request.method == 'POST':
         data = request.json
@@ -190,6 +195,8 @@ def page_sources():
         flash("Access unauthorized.", "danger")
         return redirect("/login")
 
+    source_feeds = db.session.query(SourceFeed.source_id, SourceFeed.feed_id).all()
+
     if request.method == 'GET':
         sources = Source.query.all()
         feeds = (Feed
@@ -197,14 +204,13 @@ def page_sources():
                 .filter(Feed.user_id == g.user.id)
                 .all())
 
-        return render_template('news/sources.html', sources=sources, feeds=feeds)
+        return render_template('news/sources.html', sources=sources, feeds=feeds, source_feeds=source_feeds)
 
     elif request.method == "POST":
         
         data = request.json
         source_id = data['source_id']
         feeds = data['feed_id']
-
         for feed in feeds:
             feed_id = feed
             source_id = source_id
@@ -212,7 +218,6 @@ def page_sources():
             source_feed = SourceFeed(source_id=source_id, feed_id=feed_id)
             db.session.add(source_feed)
             db.session.commit()
-        
         return jsonify(message="added")
 
 
@@ -223,6 +228,8 @@ def page_search():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/login")
+    
+    article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
 
     boards = (Board.query
                     .filter(Board.user_id == g.user.id)
@@ -235,7 +242,7 @@ def page_search():
         search = request.form.get('q') or None
         news = news_search(search)
 
-        return render_template('news/search.html', news=news, boards=boards)
+        return render_template('news/search.html', news=news, boards=boards, article_boards=article_boards)
 
     if request.method == 'POST' and request.form.get("btn-search") == "date-base":
         search = request.form.get("q") or None
@@ -243,7 +250,7 @@ def page_search():
         to_date = request.form.get("toDate") or date.today()
         news = news_advsearch(search, from_date, to_date)
 
-        return render_template('news/search.html', news=news, boards=boards)
+        return render_template('news/search.html', news=news, boards=boards, article_boards=article_boards)
 
     if request.method == 'POST':
         data = request.json
@@ -289,6 +296,8 @@ def feed_news(id):
         flash("Access unauthorized.", "danger")
         return redirect("/")
 
+    article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
+
     boards = (Board.query
                     .filter(Board.user_id == g.user.id)
                     .all())
@@ -303,9 +312,10 @@ def feed_news(id):
                 source += source_feed.source_id+','
 
             news = news_headlines_sources(source)
-            return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name)
+            return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name, 
+                                                    article_boards=article_boards)
         else:
-            flash("Please Enter source in Feed", "danger")
+            flash("Please Add source in Feed", "danger")
             return redirect('/sources')
     
     if request.method == 'POST':
@@ -399,19 +409,22 @@ def board_news(id):
 
     if request.method == 'GET':
         board = Board.query.get_or_404(id)
-        return render_template('news/boards.html', board=board)
+        article_boards = ArticleBoard.query.filter(ArticleBoard.board_id==id).all()
+
+        return render_template('news/boards.html', board=board, article_boards=article_boards)
 
     if request.method == 'PATCH':
         
         data = request.json
         article_id = data['id']
-     
-        article = Article.query.get_or_404(article_id)
 
-        if article.is_read == False:
-            article.is_read = True
-        elif article.is_read == True:
-            article.is_read = False
+        article_board = ArticleBoard.query.filter((ArticleBoard.board_id==id) & 
+                                            (ArticleBoard.article_id==article_id)).first()
+                                        
+        if article_board.is_read == False:
+            article_board.is_read = True
+        elif article_board.is_read == True:
+            article_board.is_read = False
 
         db.session.commit()
         return jsonify(message="updated")
@@ -450,9 +463,10 @@ def board_delete(id):
     ArticleBoard.query.filter(ArticleBoard.board_id == board.id).delete()
     db.session.commit()
 
-    for article in articles:
-        db.session.delete(article)
-        db.session.commit()
+    if len(articles) > 0:
+        for article in articles:
+            db.session.delete(article)
+            db.session.commit()
 
     db.session.delete(board)
     db.session.commit()

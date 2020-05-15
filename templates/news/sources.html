@@ -1,7 +1,10 @@
-{% extends 'base.html' %} {% block title %} Headlines {% endblock %} {% block content %}
+{% extends 'base.html' %} 
+{% block title %}Sources{% endblock %}
+
+{% block content %}
 
 <div class="content">
-    <h4>News Sources</h4>
+    <h4>Sources</h4>
 </div>
 
 <div class="row">
@@ -13,15 +16,23 @@
             <div class="card-body">
                 <h5 class="card-title">{{ source['name']}}</h5>
                 <p class="card-text">{{ source['description']}}</p>
-                <a href="{{ source['url']}}" class="btn btn-outline-success">{{ source['name']}}</a> {% if g.user %}
+                <a href="{{ source['url']}}" class="btn btn-outline-success" target="_blank">{{ source['name']}}</a> {% if g.user %}
                 <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
                     <h6>Add to Feed</h6>
                     <form class='feed-form'>
                         <input type='hidden' id='source_id' value='{{ source['id']}}'>                       
                         <label for='feed_id'></label>
-                        <select id='feed_id'class='custom-select' multiple>
+                        <select id='feed_id' class='custom-select' multiple>
                             {% for feed in feeds %}
-                                <option value='{{feed['id']}}'>{{feed['name']}}</option>
+
+                                <option value='{{feed['id']}}' 
+                                {% if (source['id'], feed['id']) not in source_feeds%}
+                                    enabled
+                                {% else %}
+                                    disabled style='background-color:yellow'
+                                {% endif %}
+                                >{{feed['name']}}</option>
+                               
                             {% endfor %}
                         </select>
                         <p></p>
