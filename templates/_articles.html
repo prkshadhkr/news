@@ -18,9 +18,14 @@
         </div>
         <span class="">
           <div class="col-sm-2">
+
+                {% if g.user %}
                 <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
-                <h6>Add to Board</h6>
-                  <form class='board-form'>
+                    <div class='text-center'>
+                        <h6>Add to Board</h6>
+                    </div>
+                    <form class='board-form'>
+                      <input type='hidden' id='feed_id' value='{{ feed_id }}'>
                       <input type='hidden' id='url' value='{{ data['url'] }}'>
                       <input type='hidden' id='source_id' value='{{ data['source']['id'] }}'> 
                       <input type='hidden' id='author' value='{{ data['author'] }}'> 
@@ -48,9 +53,11 @@
                           <button class='submit-board btn btn-sm btn-outline-success'>Submit</button>
                       </div>
                       
-                  </form>
-                ">+B
-              </button>
+                    </form>
+                    ">+B
+                </button>
+                {% endif %}
+                
           </div>
       </span>
     </li>

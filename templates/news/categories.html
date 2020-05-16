@@ -8,24 +8,31 @@
     <h4>Headlines</h4>
 </div>
 
-<form action="/categories" method="POST" id="search-category">
-    <div class="row" >
+<form action="/categories" method="GET">
+    <div class="row">
 
-        {{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in field.errors %}
-        <span class="text-danger">{{ error }}</span> {% endfor %}
+        {{ form.hidden_tag() }} 
+        
+        {% for field in form if field.widget.input_type != 'hidden' %} 
+            
+            {% for error in field.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
 
-        <div class="col-sm-2">
-            {{ field(placeholder=field.label.text, class="form-control") }}
-        </div>
+                <div class="col-sm-2">
+                    {{ field(placeholder=field.label.text, class="form-control") }}
+                </div>
 
         {% endfor %}
 
         <div class="col-sm-2">
-            <input type="submit" class="form-control btn btn-outline-primary">
+            <input type="submit" class="form-control btn btn-outline-primary" name="btn-submit" value="categories">
         </div>
 
     </div>
 
 </form>
 
-{% include "_articles.html" %} {% endblock %}
+{% include "_articles.html" %} 
+
+{% endblock %}

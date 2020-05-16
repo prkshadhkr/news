@@ -8,12 +8,18 @@
     <h4>Headlines</h4>
 </div>
 
-<form action="/headlines" method="POST">
+<form action="/headlines" method="GET">
     <div class="row">
         <div class="col-sm-2">
 
-            {{ form.hidden_tag() }} {% for field in form if field.widget.input_type != 'hidden' %} {% for error in field.errors %}
-            <span class="text-danger">{{ error }}</span> {% endfor %} {{ field(placeholder=field.label.text, class="form-control") }} {% endfor %}
+            {{ form.hidden_tag() }} 
+            {% for field in form if field.widget.input_type != 'hidden' %} 
+                {% for error in field.errors %}
+                    <span class="text-danger">{{ error }}</span>
+                {% endfor %} 
+                
+                {{ field(placeholder=field.label.text, class="form-control") }} 
+             {% endfor %}
 
         </div>
         <div class="col-sm-2">

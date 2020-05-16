@@ -64,8 +64,9 @@ $(document).ready(function() {
 
 /*************************** Boards ****************************/
 
+
 $(document).ready(function() {
-    $(document).on('click', '.submit-board', async function(e) {
+    $(document).on('click', '.submit-board', function(e) {
 
         e.preventDefault();
         let url = $('.board-form').find('#url').val();
@@ -78,32 +79,56 @@ $(document).ready(function() {
         let content = $('.board-form').find('#content').val();
 
         let boardId = $('.board-form').find('#board_id').val();
+
+        // feedId- is used to get article from specific feed
+        let feedId = $('.board-form').find('#feed_id').val();
+
         let currentURL = $(location).attr('href');
 
-        await axios.post(`${currentURL}`, {
-                url: url,
-                source_id: sourceId,
-                author: author,
-                title: title,
-                description: description,
-                img_url: imgURL,
-                published_at: publishedAt,
-                content: content,
-                board_id: boardId
-            })
-            .then(function(response) {
+        if (currentURL.indexOf(`${REQ_URL}/categories`) > -1) {
+            makeRequest(`${REQ_URL}/categories`);
+        }
 
-                // $(".col-sm-2").load(".col-sm-2 > *");
-                location.reload();
+        if (currentURL.indexOf(`${REQ_URL}/headlines`) > -1) {
+            makeRequest(`${REQ_URL}/headlines`);
 
-                console.log(response);
-            })
-            .catch(function(error) {
-                console.log(error);
-            });
+        }
+
+        if (currentURL.indexOf(`${REQ_URL}/search`) > -1) {
+            makeRequest(`${REQ_URL}/search`);
+
+        }
+
+        if (currentURL.indexOf(`${REQ_URL}/feeds/${feedId}`) > -1) {
+            makeRequest(`${REQ_URL}/feeds/${feedId}`);
+
+        }
+
+        async function makeRequest(urlRoute) {
+
+            await axios.post(urlRoute, {
+                    url: url,
+                    source_id: sourceId,
+                    author: author,
+                    title: title,
+                    description: description,
+                    img_url: imgURL,
+                    published_at: publishedAt,
+                    content: content,
+                    board_id: boardId
+                })
+                .then(function(response) {
+                    location.reload();
+                    console.log(response);
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
+        }
+
     });
-
 });
+
 
 
 /************ articles read  *************/

@@ -1,5 +1,6 @@
 {% extends 'base.html' %} 
-{% block title %}Sources{% endblock %}
+
+{% block title %}Sources{% endblock %} 
 
 {% block content %}
 
@@ -10,15 +11,18 @@
 <div class="row">
 
     {% for source in sources %}
-
     <div class="col-sm-4">
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">{{ source['name']}}</h5>
                 <p class="card-text">{{ source['description']}}</p>
-                <a href="{{ source['url']}}" class="btn btn-outline-success" target="_blank">{{ source['name']}}</a> {% if g.user %}
+                <a href="{{ source['url']}}" class="btn btn-outline-success" target="_blank">{{ source['name']}}</a> 
+                    
+                {% if g.user %}
                 <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
-                    <h6>Add to Feed</h6>
+                    <div class='text-center'>
+                        <h6>Add to Feed</h6>
+                    </div>
                     <form class='feed-form'>
                         <input type='hidden' id='source_id' value='{{ source['id']}}'>                       
                         <label for='feed_id'></label>
@@ -43,12 +47,12 @@
                     </form>">+F
                 </button>
                 {% endif %}
-
+                
             </div>
-
         </div>
-
     </div>
     {% endfor %}
+
 </div>
+
 {% endblock %}

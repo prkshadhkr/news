@@ -1,18 +1,17 @@
 # import os
 from flask import Flask, render_template, request, flash, redirect, session, g, abort, jsonify
+from forms import UserEditForm, LoginForm, AddForm, CountryForm, CategoryByCountry
+from models import db, connect_db, Article, Board, Feed, Source, User, SourceFeed, ArticleBoard
 from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
-
-from forms import UserEditForm, LoginForm, AddForm, CountryForm, CategoryByCountry
-from models import db, connect_db, Article, Board, Feed, Source, User, SourceFeed, ArticleBoard
 from datetime import date
 from constants import CATEGORIES, BASE_URL
 
-import requests
-
-#### Note: Please get your api key from https://newsapi.org/docs/endpoints/sources ######
+# for API_KEY visit "https://newsapi.org/"
 API_KEY = "YOUR API KEY"
+
+import requests
 
 CURR_USER_KEY = "curr_user"
 
@@ -124,7 +123,6 @@ def update_articles(data):
 def index():
     return render_template('news/index.html')
 
-
 @app.route('/headlines', methods=['GET', 'POST'])
 def page_headlines():
     
@@ -134,21 +132,18 @@ def page_headlines():
     
     article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
 
-    form = CountryForm()
+    form = CountryForm(request.args, csrf_enabled=False)
     boards = (Board.query
                     .filter(Board.user_id == g.user.id)
                     .all())
 
     if request.method == 'GET':
-        country = g.user.country
-        news = news_headlines(country)
-        return render_template('news/headlines.html', news=news, form=form, boards=boards, article_boards=article_boards)
-
-    if request.method == 'POST' and form.validate():
-        country=form.country.data or g.user.country
+        country=request.args.get('country') or g.user.country
 
         news = news_headlines(country)
-        return render_template('news/headlines.html', news=news, form=form, boards=boards, article_boards=article_boards)
+        return render_template('news/headlines.html', news=news, 
+                                                    form=form, boards=boards,
+                                                    article_boards=article_boards)
 
     if request.method == 'POST':
         data = request.json
@@ -166,20 +161,22 @@ def page_categories():
 
     article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
 
-    form = CategoryByCountry()
+    form = CategoryByCountry(request.args, csrf_enabled=False)
     boards = (Board.query
                     .filter(Board.user_id == g.user.id)
                     .all())
 
-    if request.method == 'GET':
-        return render_template('news/categories.html', form=form)
 
-    if request.method == 'POST' and form.validate():
-        country = form.country.data
-        category = form.category.data 
+    if request.method == 'GET' and request.args.get("btn-submit") == "categories":
+        country = request.args.get("country") or g.user.country
+        category = request.args.get("category")
 
         news = news_categories(country, category)
-        return render_template('news/categories.html', form=form, news=news, boards=boards, article_boards=article_boards)
+        return render_template('news/categories.html', form=form, news=news, 
+                                                    boards=boards, article_boards=article_boards)
+
+    if request.method == 'GET':
+        return render_template('news/categories.html', form=form)
 
     if request.method == 'POST':
         data = request.json
@@ -204,7 +201,8 @@ def page_sources():
                 .filter(Feed.user_id == g.user.id)
                 .all())
 
-        return render_template('news/sources.html', sources=sources, feeds=feeds, source_feeds=source_feeds)
+        return render_template('news/sources.html', sources=sources, 
+                                                    feeds=feeds, source_feeds=source_feeds)
 
     elif request.method == "POST":
         
@@ -221,7 +219,6 @@ def page_sources():
         return jsonify(message="added")
 
 
-
 @app.route('/search', methods=['GET', 'POST'])
 def page_search():
     
@@ -235,22 +232,24 @@ def page_search():
                     .filter(Board.user_id == g.user.id)
                     .all())
 
-    if request.method == 'GET':
-        return render_template('news/search.html')
-
-    if request.method == 'POST' and request.form.get("btn-search") == "general":
-        search = request.form.get('q') or None
+    if request.method == 'GET' and (request.args.get("btn-search") == "general"):
+        search = request.args.get('q') or None
         news = news_search(search)
 
-        return render_template('news/search.html', news=news, boards=boards, article_boards=article_boards)
+        return render_template('news/search.html', news=news, 
+                                                boards=boards, article_boards=article_boards)
 
-    if request.method == 'POST' and request.form.get("btn-search") == "date-base":
-        search = request.form.get("q") or None
-        from_date = request.form.get("fromDate") or None
-        to_date = request.form.get("toDate") or date.today()
+    if (request.method == 'GET') and (request.args.get("btn-search") == "date-base"):
+        search = request.args.get("q") or None
+        from_date = request.args.get("fromDate") or None
+        to_date = request.args.get("toDate") or date.today()
         news = news_advsearch(search, from_date, to_date)
 
-        return render_template('news/search.html', news=news, boards=boards, article_boards=article_boards)
+        return render_template('news/search.html', news=news,
+                                                boards=boards, article_boards=article_boards)
+
+    if request.method == 'GET':
+        return render_template('news/search.html')
 
     if request.method == 'POST':
         data = request.json
@@ -303,16 +302,17 @@ def feed_news(id):
                     .all())
 
     if request.method == 'GET':
-        id = Feed.query.get_or_404(id)
-        feed_name = id.name
-        source_feeds = id.source_feeds
+        feed = Feed.query.get_or_404(id)
+        feed_name = feed.name
+        source_feeds = feed.source_feeds
         source =''
         if len(source_feeds) > 0:
             for source_feed in source_feeds:
                 source += source_feed.source_id+','
 
             news = news_headlines_sources(source)
-            return render_template('news/feeds.html', news=news, boards=boards, feed_name=feed_name, 
+            return render_template('news/feeds.html', feed_id=id, news=news, boards=boards, 
+                                                    feed_name=feed_name, 
                                                     article_boards=article_boards)
         else:
             flash("Please Add source in Feed", "danger")
@@ -606,7 +606,7 @@ def login():
         if user:
             do_login(user)
             flash(f"Hello, {user.username}!", "success")
-            # return redirect("/")
+           
             return redirect("/headlines")
 
         flash("Invalid credentials.", 'danger')

@@ -9,7 +9,7 @@
 </div>
 
 
-<form action="/search" method="POST">
+<form action="/search" method="GET">
     <div class="row">
         <div class="col-sm-1.5">
             <label for="fromDate">From:</label>
@@ -35,4 +35,6 @@
 
 </form>
 
-{% include "_articles.html" %} {% endblock %}
+{% include "_articles.html" %} 
+
+{% endblock %}

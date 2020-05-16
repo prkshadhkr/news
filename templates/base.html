@@ -40,7 +40,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     {% if request.endpoint != None %}
                     <li>
-                        <form action="/search" method="POST" class="navbar-form navbar-right" >
+                        <form action="/search" method="GET" class="navbar-form navbar-right" >
                             <input name="q" class="form-control" placeholder="Search">
                             <button class="btn btn-default" name="btn-search" value="general">
                                  <span class="fa fa-search"></span>

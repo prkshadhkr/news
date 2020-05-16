@@ -129,9 +129,6 @@ class Source(db.Model):
     #relationships for source_feeds
     source_feeds = db.relationship('SourceFeed', backref="sources")
 
-    #relationship with articles
-    # articles = db.relationship('Article', backref="source")
-
 
 class User(db.Model):
     """users table"""
