@@ -94,11 +94,11 @@ def page_headlines():
         country=request.args.get('country') or g.user.country
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_headlines(country)
+        news = news_headlines(country, page)
 
         # result = news.paginate(page = page, per_page =20)
 
-        pagination = Pagination(page=page, news=news, per_page =10, total=len(news))
+        pagination = Pagination(page=page, per_page =10, total=len(news))
 
         #sources = Source.query.paginate(page = page, per_page = 20)
    
