@@ -1,7 +1,8 @@
 """Seed file to make sample data for db."""
 
 from models import Article, Board, Feed, Source, User, db
-from app import app, news_sources
+from app import app
+from external_apis import news_sources
 
 # Create all tables
 db.drop_all()

@@ -2,7 +2,6 @@
 
 <ul class="list-unstyled">
     <li class="media">
-      
         <a href="{{data['url']}}" target="_blank">
             <img src="{{ data['urlToImage'] }}" class="rounded d-flex mr-3" alt="..." target="_blank">
         </a>
@@ -65,18 +64,3 @@
 </ul>
 
 {% endfor %}
-
-<br>
-<div class="row justify-content-lg-center">
-    {% for page_num in pagination.pages %}
-        {% if page_num %}
-            {% if pagination.page == page_num %}
-                <a class="btn btn-primary mb-4 margin-left"href="{{ url_for(page_name, page=page_num) }}">{{ page_num }}</a>
-            {% else %}
-                <a class="btn btn-outline-primary mb-4 margin-left"href="{{ url_for(page_name, page=page_num) }}">{{ page_num }}</a>
-            {% endif %}
-        {% else %}
-            ...
-        {% endif %}
-    {% endfor %}
-</div>

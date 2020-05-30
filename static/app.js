@@ -1,4 +1,7 @@
-REQ_URL = "http://127.0.0.1:5000"
+// const REQ_URL = "http://127.0.0.1:5000";
+const REQ_URL = `http://${location.host}`;
+
+
 
 //*************** side navbar scripts: *****************//
 const mySliedbar = document.getElementById("mySidebar")
@@ -47,12 +50,15 @@ $(document).ready(function() {
         let sourceId = $('.feed-form').find('#source_id').val();
         let feedId = $('.feed-form').find('#feed_id').val();
 
+
         axios.post(`${REQ_URL}/sources`, {
                 source_id: sourceId,
                 feed_id: feedId
             })
             .then(function(response) {
                 location.reload();
+                // let testURL = $(location).attr('href');
+                // $('.test-reload').load(document.testURL + ' .test-reload');
             })
             .catch(function(error) {
                 console.log(error);
