@@ -1,0 +1,45 @@
+diff --git a/app.py b/app.py
+index 9ddc6c3..85abce8 100644
+--- a/app.py
++++ b/app.py
+@@ -94,11 +94,11 @@ def page_headlines():
+         country=request.args.get('country') or g.user.country
+ 
+         page = request.args.get(get_page_parameter(), type=int, default=1)
+-        news = news_headlines(country)
++        news = news_headlines(country, page)
+ 
+         # result = news.paginate(page = page, per_page =20)
+ 
+-        pagination = Pagination(page=page, news=news, per_page =10, total=len(news))
++        pagination = Pagination(page=page, per_page =10, total=len(news))
+ 
+         #sources = Source.query.paginate(page = page, per_page = 20)
+    
+diff --git a/external_apis.py b/external_apis.py
+index 4bbf9eb..afb44cd 100644
+--- a/external_apis.py
++++ b/external_apis.py
+@@ -5,8 +5,8 @@ import requests
+ 
+ ################## External API calls #######################
+ 
+-def news_headlines(country):
+-    url = (f"{BASE_URL}/top-headlines?country={country}&apiKey={API_KEY}&pageSize=100")
++def news_headlines(country, page = 1):
++    url = (f"{BASE_URL}/top-headlines?country={country}&apiKey={API_KEY}&pageSize=100&page={page}")
+     res = requests.get(url)
+     data = res.json()
+     articles = data['articles']
+diff --git a/requirements.txt b/requirements.txt
+index 59a4c3d..9717ede 100644
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -10,6 +10,7 @@ Flask==1.1.2
+ Flask-Bcrypt==0.7.1
+ Flask-Cors==3.0.8
+ Flask-DebugToolbar==0.11.0
++flask-paginate==0.6.0
+ Flask-SQLAlchemy==2.4.1
+ Flask-WTF==0.14.3
+ idna==2.9
