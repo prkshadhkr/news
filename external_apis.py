@@ -5,8 +5,8 @@ import requests
 
 ################## External API calls #######################
 
-def news_headlines(country, page = 1):
-    url = (f"{BASE_URL}/top-headlines?country={country}&apiKey={API_KEY}&pageSize=100&page={page}")
+def news_headlines(country,):
+    url = (f"{BASE_URL}/top-headlines?country={country}&apiKey={API_KEY}&pageSize=100")
     res = requests.get(url)
     data = res.json()
     articles = data['articles']
