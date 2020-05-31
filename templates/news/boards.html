@@ -31,7 +31,8 @@
                
                 <form class="article-update">
                     <!-- <input type="hidden" id="title" value="{{ data['title'] }}">  -->
-                    <button data-id="{{ data.articles['id'] }}" class="submit-read btn btn-sm btn-outline-secondary">
+                    <button data-id="{{ data.articles['id'] }}" class="
+                                        submit-read btn btn-sm btn-outline-secondary">
                         {% if data['is_read'] == True %}
                             ✔
                          {% else %}
@@ -57,9 +58,11 @@
     {% for page_num in article_boards.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
             {% if article_boards.page == page_num %}
-                <a class="btn btn-primary mb-4 margin-left"href="{{ url_for('board_news', id=board.id, page=page_num) }}">{{ page_num }}</a>
+                <a class="btn btn-primary mb-4 margin-left" href=
+                "{{ url_for('board_news', id=board.id, page=page_num) }}">{{ page_num }}</a>
             {% else %}
-                <a class="btn btn-outline-primary mb-4 margin-left"href="{{ url_for('board_news', id=board.id, page=page_num) }}">{{ page_num }}</a>
+                <a class="btn btn-outline-primary mb-4 margin-left" href=
+                "{{ url_for('board_news', id=board.id, page=page_num) }}">{{ page_num }}</a>
             {% endif %}
         {% else %}
             ...

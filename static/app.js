@@ -1,6 +1,4 @@
-// const REQ_URL = "http://127.0.0.1:5000";
 const REQ_URL = `http://${location.host}`;
-
 
 
 //*************** side navbar scripts: *****************//
@@ -57,8 +55,6 @@ $(document).ready(function() {
             })
             .then(function(response) {
                 location.reload();
-                // let testURL = $(location).attr('href');
-                // $('.test-reload').load(document.testURL + ' .test-reload');
             })
             .catch(function(error) {
                 console.log(error);
@@ -69,7 +65,6 @@ $(document).ready(function() {
 
 
 /*************************** Boards ****************************/
-
 
 $(document).ready(function() {
     $(document).on('click', '.submit-board', function(e) {
@@ -97,21 +92,17 @@ $(document).ready(function() {
 
         if (currentURL.indexOf(`${REQ_URL}/headlines`) > -1) {
             makeRequest(`${REQ_URL}/headlines`);
-
         }
 
         if (currentURL.indexOf(`${REQ_URL}/search`) > -1) {
             makeRequest(`${REQ_URL}/search`);
-
         }
 
         if (currentURL.indexOf(`${REQ_URL}/feeds/${feedId}`) > -1) {
             makeRequest(`${REQ_URL}/feeds/${feedId}`);
-
         }
 
         async function makeRequest(urlRoute) {
-
             await axios.post(urlRoute, {
                     url: url,
                     source_id: sourceId,
@@ -143,7 +134,6 @@ $('.submit-read').click(readArticle)
 async function readArticle(e) {
     e.preventDefault()
     let id = $(this).data('id');
-    // let title = $(this).siblings('#title').val();
     let currentURL = $(location).attr('href');
     console.log('id :', id)
 

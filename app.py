@@ -6,9 +6,11 @@ from flask_cors import CORS
 from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from datetime import date, timedelta
-from external_apis import news_headlines, news_headlines_sources, news_categories, news_sources, news_search, news_advsearch
+from external_apis import news_headlines, news_domains, news_categories, news_sources, news_search, news_advsearch
+from config import per_page, total
 
 from flask_paginate import Pagination, get_page_parameter
+from tld import get_tld
 
 CURR_USER_KEY = "curr_user"
 
@@ -69,7 +71,6 @@ def update_articles(data):
     return
 
 
-
 #########################  Routes ########################################
 
 @app.route('/')
@@ -94,24 +95,22 @@ def page_headlines():
         country=request.args.get('country') or g.user.country
     
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_headlines(country, page)
-        pagination = Pagination(page=page, per_page=20, total = 50)
+        try:
+            news = news_headlines(country, page)
+        except:
+            return render_template('404.html')
+        pagination = Pagination(page=page, per_page=per_page, total = 40)
 
         return render_template('news/headlines.html', news=news, 
                                     form=form, boards=boards,
                                     article_boards=article_boards, country=country,
                                     page_name="page_headlines", pagination=pagination)
 
-#         news = news_headlines(country)
-#         return render_template('news/headlines.html', news=news, 
-#                                                     form=form, boards=boards,
-#                                                     article_boards=article_boards)
     if request.method == 'POST':
         data = request.json
         update_articles(data)
 
         return jsonify(message="added")
-
 
 
 @app.route('/categories', methods=['GET', 'POST'])
@@ -134,17 +133,16 @@ def page_categories():
         category = request.args.get("category")
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_categories(country, category, page)
-        pagination = Pagination(page=page, per_page=20, total=100)
+        try:
+            news = news_categories(country, category, page)
+        except:
+            return render_template('404.html')
+        pagination = Pagination(page=page, per_page=per_page, total=total)
 
         return render_template('news/categories.html', form=form, news=news, 
                                 boards=boards, article_boards=article_boards,
                                 page_name="page_categories", country=country, btn_submit="categories",
                                 category=category, pagination=pagination)
-
-        # news = news_categories(country, category)
-        # return render_template('news/categories.html', form=form, news=news, 
-        #                                             boards=boards, article_boards=article_boards)
 
     if request.method == 'GET':
         return render_template('news/categories.html', form=form)
@@ -154,7 +152,6 @@ def page_categories():
         update_articles(data)
 
         return jsonify(message="added")
-
 
 
 @app.route('/sources', methods=['GET', 'POST'])
@@ -167,8 +164,9 @@ def page_sources():
     source_feeds = db.session.query(SourceFeed.source_id, SourceFeed.feed_id).all()
 
     if request.method == 'GET':
+        
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        sources = Source.query.paginate(page = page, per_page = 20)
+        sources = Source.query.paginate(page = page, per_page = per_page)
 
         feeds = (Feed
                 .query
@@ -193,7 +191,6 @@ def page_sources():
         return jsonify(message="added")
 
 
-
 @app.route('/search', methods=['GET', 'POST'])
 def page_search():
     
@@ -211,17 +208,15 @@ def page_search():
         search = request.args.get('q') or None
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_search(search, page)
-        pagination = Pagination(page=page, per_page=20, total=100)
+        try:
+            news = news_search(search, page)
+        except:
+            return render_template('404.html')
+        pagination = Pagination(page=page, per_page=per_page, total=total)
      
         return render_template('news/search.html', news=news,
                         boards=boards, article_boards=article_boards, search_type="general",
                         q= search,  page_name="page_search", pagination=pagination)
-
-        # news = news_search(search)
-
-        # return render_template('news/search.html', news=news, 
-        #                                         boards=boards, article_boards=article_boards)
 
     if (request.method == 'GET') and (request.args.get("search_type") == "date_base"):
         search = request.args.get("q") or None
@@ -236,18 +231,16 @@ def page_search():
             from_date = month_ago.isoformat()
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_advsearch(search, from_date, to_date, page)
-        pagination = Pagination(page=page, per_page=20, total=100)
+        try:
+            news = news_advsearch(search, from_date, to_date, page)
+        except:
+            return render_template('404.html')
+        pagination = Pagination(page=page, per_page=per_page, total=total)
 
         return render_template('news/search.html', news=news,
                             boards=boards, article_boards=article_boards, search_type="date_base",
                             q=search, from_date=from_date, to_date=to_date,
                             page_name="page_search", pagination=pagination)
-
-        # news = news_advsearch(search, from_date, to_date)
-
-        # return render_template('news/search.html', news=news,
-        #                                         boards=boards, article_boards=article_boards)
 
     if request.method == 'GET':
         return render_template('news/search.html')
@@ -306,15 +299,24 @@ def feed_news(id):
         feed = Feed.query.get_or_404(id)
         feed_name = feed.name
         source_feeds = feed.source_feeds
-        source =''
+        domains =""
         if len(source_feeds) > 0:
             for source_feed in source_feeds:
-                source += source_feed.source_id+','
+                res = get_tld(source_feed.sources.url, as_object=True)
+                domains += res.fld+','
+            domains = domains[:-1]
+          
+            page = request.args.get(get_page_parameter(), type=int, default=1)
+            try:
+                news = news_domains(domains, page)
+            except:
+                return render_template('404.html')
+            pagination = Pagination(page=page, per_page=per_page, total=total)  
 
-            news = news_headlines_sources(source)
             return render_template('news/feeds.html', feed_id=id, news=news, boards=boards, 
-                                                    feed_name=feed_name, 
-                                                    article_boards=article_boards)
+                                    feed_name=feed_name, article_boards=article_boards,
+                                     pagination=pagination)
+
         else:
             flash("Please Add source in Feed", "danger")
             return redirect('/sources')
@@ -410,11 +412,10 @@ def board_news(id):
 
     if request.method == 'GET':
         board = Board.query.get_or_404(id)
-        # article_boards = ArticleBoard.query.filter(ArticleBoard.board_id==id).all()
 
         page = request.args.get(get_page_parameter(), type=int, default=1)
         article_boards = ArticleBoard.query.filter(ArticleBoard.board_id==id)\
-                            .order_by(ArticleBoard.id.desc()).paginate(page = page, per_page = 20)
+                            .order_by(ArticleBoard.id.desc()).paginate(page = page, per_page = per_page)
 
         return render_template('news/boards.html', board=board, article_boards=article_boards)
 
@@ -448,7 +449,6 @@ def board_news(id):
         db.session.commit()
 
         return jsonify(message="deleted")
-
 
 
 @app.route('/boards/<int:id>/delete', methods=['POST'])
@@ -533,7 +533,6 @@ def delete_user():
     db.session.commit()
 
     return redirect("/signup")
-
 
 
 ########################### User: signup/login/logout #################################
@@ -635,3 +634,10 @@ def logout():
 @app.route('/contact')
 def page_contact():
     return render_template("contact.html")
+
+
+##################### Error #######################
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html')
