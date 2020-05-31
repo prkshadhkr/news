@@ -92,56 +92,26 @@ def page_headlines():
 
     if request.method == 'GET':
         country=request.args.get('country') or g.user.country
-
+    
         page = request.args.get(get_page_parameter(), type=int, default=1)
-        news = news_headlines(country)
+        news = news_headlines(country, page)
+        pagination = Pagination(page=page, per_page=20, total = 50)
 
-        # result = news.paginate(page = page, per_page =20)
-
-        pagination = Pagination(page=page, per_page =10, total=len(news))
-
-        #sources = Source.query.paginate(page = page, per_page = 20)
-   
         return render_template('news/headlines.html', news=news, 
-                                                    form=form, boards=boards,
-                                                    article_boards=article_boards,
-                                                    page_name="page_headlines", pagination=pagination)
+                                    form=form, boards=boards,
+                                    article_boards=article_boards, country=country,
+                                    page_name="page_headlines", pagination=pagination)
 
+#         news = news_headlines(country)
+#         return render_template('news/headlines.html', news=news, 
+#                                                     form=form, boards=boards,
+#                                                     article_boards=article_boards)
     if request.method == 'POST':
         data = request.json
         update_articles(data)
 
         return jsonify(message="added")
 
-
-
-# @app.route('/headlines', methods=['GET', 'POST'])
-# def page_headlines():
-    
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/login")
-    
-#     article_boards = db.session.query(ArticleBoard.board_id, Article.url).join(Article).all()
-
-#     form = CountryForm(request.args, csrf_enabled=False)
-#     boards = (Board.query
-#                     .filter(Board.user_id == g.user.id)
-#                     .all())
-
-#     if request.method == 'GET':
-#         country=request.args.get('country') or g.user.country
-
-#         news = news_headlines(country)
-#         return render_template('news/headlines.html', news=news, 
-#                                                     form=form, boards=boards,
-#                                                     article_boards=article_boards)
-
-#     if request.method == 'POST':
-#         data = request.json
-#         update_articles(data)
-
-#         return jsonify(message="added")
 
 
 @app.route('/categories', methods=['GET', 'POST'])
@@ -159,13 +129,22 @@ def page_categories():
                     .all())
 
 
-    if request.method == 'GET' and request.args.get("btn-submit") == "categories":
+    if request.method == 'GET' and request.args.get("btn_submit") == "categories":
         country = request.args.get("country") or g.user.country
         category = request.args.get("category")
 
-        news = news_categories(country, category)
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        news = news_categories(country, category, page)
+        pagination = Pagination(page=page, per_page=20, total=100)
+
         return render_template('news/categories.html', form=form, news=news, 
-                                                    boards=boards, article_boards=article_boards)
+                                boards=boards, article_boards=article_boards,
+                                page_name="page_categories", country=country, btn_submit="categories",
+                                category=category, pagination=pagination)
+
+        # news = news_categories(country, category)
+        # return render_template('news/categories.html', form=form, news=news, 
+        #                                             boards=boards, article_boards=article_boards)
 
     if request.method == 'GET':
         return render_template('news/categories.html', form=form)
@@ -191,7 +170,6 @@ def page_sources():
         page = request.args.get(get_page_parameter(), type=int, default=1)
         sources = Source.query.paginate(page = page, per_page = 20)
 
-        # sources = Source.query.all()
         feeds = (Feed
                 .query
                 .filter(Feed.user_id == g.user.id)
@@ -215,40 +193,6 @@ def page_sources():
         return jsonify(message="added")
 
 
-    
-# @app.route('/sources', methods=['GET', 'POST'])
-# def page_sources():
-    
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/login")
-
-#     source_feeds = db.session.query(SourceFeed.source_id, SourceFeed.feed_id).all()
-
-#     if request.method == 'GET':
-#         sources = Source.query.all()
-#         feeds = (Feed
-#                 .query
-#                 .filter(Feed.user_id == g.user.id)
-#                 .all())
-
-#         return render_template('news/sources.html', sources=sources, 
-#                                                     feeds=feeds, source_feeds=source_feeds)
-
-#     elif request.method == "POST":
-        
-#         data = request.json
-#         source_id = data['source_id']
-#         feeds = data['feed_id']
-#         for feed in feeds:
-#             feed_id = feed
-#             source_id = source_id
-
-#             source_feed = SourceFeed(source_id=source_id, feed_id=feed_id)
-#             db.session.add(source_feed)
-#             db.session.commit()
-#         return jsonify(message="added")
-
 
 @app.route('/search', methods=['GET', 'POST'])
 def page_search():
@@ -263,14 +207,23 @@ def page_search():
                     .filter(Board.user_id == g.user.id)
                     .all())
 
-    if request.method == 'GET' and (request.args.get("btn-search") == "general"):
+    if request.method == 'GET' and (request.args.get("search_type") == "general"):
         search = request.args.get('q') or None
-        news = news_search(search)
 
-        return render_template('news/search.html', news=news, 
-                                                boards=boards, article_boards=article_boards)
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        news = news_search(search, page)
+        pagination = Pagination(page=page, per_page=20, total=100)
+     
+        return render_template('news/search.html', news=news,
+                        boards=boards, article_boards=article_boards, search_type="general",
+                        q= search,  page_name="page_search", pagination=pagination)
 
-    if (request.method == 'GET') and (request.args.get("btn-search") == "date-base"):
+        # news = news_search(search)
+
+        # return render_template('news/search.html', news=news, 
+        #                                         boards=boards, article_boards=article_boards)
+
+    if (request.method == 'GET') and (request.args.get("search_type") == "date_base"):
         search = request.args.get("q") or None
 
         today = date.today()
@@ -282,10 +235,19 @@ def page_search():
         if (date.fromisoformat(to_date) - date.fromisoformat(from_date)).days > 30:
             from_date = month_ago.isoformat()
 
-        news = news_advsearch(search, from_date, to_date)
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        news = news_advsearch(search, from_date, to_date, page)
+        pagination = Pagination(page=page, per_page=20, total=100)
 
         return render_template('news/search.html', news=news,
-                                                boards=boards, article_boards=article_boards)
+                            boards=boards, article_boards=article_boards, search_type="date_base",
+                            q=search, from_date=from_date, to_date=to_date,
+                            page_name="page_search", pagination=pagination)
+
+        # news = news_advsearch(search, from_date, to_date)
+
+        # return render_template('news/search.html', news=news,
+        #                                         boards=boards, article_boards=article_boards)
 
     if request.method == 'GET':
         return render_template('news/search.html')
@@ -487,51 +449,6 @@ def board_news(id):
 
         return jsonify(message="deleted")
 
-
-
-# @app.route('/boards/<int:id>', methods=['GET', 'PATCH', 'POST'])
-# def board_news(id):
-    
-#     if not g.user:
-#         flash("Access unauthorized.", "danger")
-#         return redirect("/")
-
-#     if request.method == 'GET':
-#         board = Board.query.get_or_404(id)
-#         article_boards = ArticleBoard.query.filter(ArticleBoard.board_id==id).all()
-
-#         return render_template('news/boards.html', board=board, article_boards=article_boards)
-
-#     if request.method == 'PATCH':
-        
-#         data = request.json
-#         article_id = data['id']
-
-#         article_board = ArticleBoard.query.filter((ArticleBoard.board_id==id) & 
-#                                             (ArticleBoard.article_id==article_id)).first()
-                                        
-#         if article_board.is_read == False:
-#             article_board.is_read = True
-#         elif article_board.is_read == True:
-#             article_board.is_read = False
-
-#         db.session.commit()
-#         return jsonify(message="updated")
-    
-#     if request.method == 'POST':
-        
-#         data = request.json
-#         article_id = data['id']
-#         article = Article.query.get_or_404(article_id)
-        
-#         ArticleBoard.query.filter((ArticleBoard.board_id==id) & 
-#                                     (ArticleBoard.article_id==article.id)).delete()
-        
-#         db.session.commit()
-#         db.session.delete(article)
-#         db.session.commit()
-
-#         return jsonify(message="deleted")
 
 
 @app.route('/boards/<int:id>/delete', methods=['POST'])

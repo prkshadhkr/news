@@ -31,7 +31,7 @@
 
 {% if g.user %}
 <div class="row justify-content-center">
-    <div class="col-sm-4">
+    <div class="">
         <ul class="list-group">
 
             {% for board in boards %}
@@ -40,6 +40,7 @@
                     <h5>
                         <a href="/boards/{{ board.id }}" class="board-link"> {{board.name}} </a>
                     </h5>
+                    <p> Sample articles:</p>
                 </div>
                 <br>
                 <div class="col-sm-2">
@@ -49,7 +50,22 @@
                 </div>
                 <br>
             </li>
-            <div class="row justify-content-center"></div>
+            <div class="">
+                <ul class="">
+
+                    {% for article in board.articles | batch(5) | first %}
+                    <li class="">
+                        <div class="">
+                            <h6>
+                                {{ article.title }}
+                            </h6>
+                        </div>
+                    </li>
+                    {% endfor %}
+
+                </ul>
+            </div>
+            <p></p>  
             {% endfor %}
 
         </ul>

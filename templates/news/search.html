@@ -27,7 +27,7 @@
         </div>
         <div class="col-sm-3">
             <input name="q" class="form-control" placeholder="Search">
-            <button class="btn btn-default" name="btn-search" value="date-base">
+            <button class="btn btn-default" name="search_type" value="date_base">
             <span class="fa fa-search"></span>
             </button>
         </div>
@@ -36,5 +36,47 @@
 </form>
 
 {% include "_articles.html" %} 
+
+<br>
+{% if search_type == "general" %}
+<div class="row justify-content-lg-center">
+    {% for page_num in pagination.pages %}
+        {% if page_num %}
+            {% if pagination.page == page_num %}
+                
+                <a class="btn btn-primary mb-4 margin-left"href=
+                "{{ url_for(page_name, page=page_num, search_type=search_type, 
+                q=q) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-primary mb-4 margin-left"href=
+                "{{ url_for(page_name, page=page_num, search_type=search_type, 
+                q=q) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
+{% if search_type == "date_base" %}
+<div class="row justify-content-lg-center">
+    {% for page_num in pagination.pages %}
+        {% if page_num %}
+            {% if pagination.page == page_num %}
+                
+                <a class="btn btn-primary mb-4 margin-left"href=
+                "{{ url_for(page_name, page=page_num, search_type=search_type, 
+                q=q, to_date=to_date, from_date=from_date) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-primary mb-4 margin-left"href=
+                "{{ url_for(page_name, page=page_num, search_type=search_type, 
+                q=q, to_date=to_date, from_date=from_date ) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+</div>
+{% endif %}
 
 {% endblock %}
