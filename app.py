@@ -1,4 +1,4 @@
-# import os
+import os
 from flask import Flask, render_template, request, flash, redirect, session, g, abort, jsonify
 from forms import UserEditForm, LoginForm, AddForm, CountryForm, CategoryByCountry
 from models import db, connect_db, Article, Board, Feed, Source, User, SourceFeed, ArticleBoard
@@ -17,16 +17,16 @@ CURR_USER_KEY = "curr_user"
 app = Flask(__name__)
 CORS(app)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = (
-#     os.environ.get('DATABASE_URL', 'postgres:///news_db'))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///news_db'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    os.environ.get('DATABASE_URL', 'postgres:///news_db'))
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres:///news_db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
-app.config['SECRET_KEY'] = "very-secrets"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
+# app.config['SECRET_KEY'] = "very-secrets"
 
 toolbar = DebugToolbarExtension(app)
 
