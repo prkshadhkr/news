@@ -68,7 +68,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
-    $(document).on('click', '.submit-board-heading', async function(e) {
+    $(document).on('click', '.submit-board-categories', async function(e) {
 
         e.preventDefault();
         let url = $('.board-form').find('#url').val();
@@ -79,11 +79,73 @@ $(document).ready(function() {
         let imgURL = $('.board-form').find('#img_url').val();
         let publishedAt = $('.board-form').find('#published_at').val();
         let content = $('.board-form').find('#content').val();
-
         let boardId = $('.board-form').find('#board_id').val();
 
-        // feedId- is used to get article from specific feed
-        let feedId = $('.board-form').find('#feed_id').val();
+        await axios.post(`${REQ_URL}/categories`, {
+                url: url,
+                source_id: sourceId,
+                author: author,
+                title: title,
+                description: description,
+                img_url: imgURL,
+                published_at: publishedAt,
+                content: content,
+                board_id: boardId
+            })
+            .then(function(response) {
+                location.reload();
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    });
+
+
+    $(document).on('click', '.submit-board-feeds', async function(e) {
+
+        e.preventDefault();
+        let url = $('.board-form').find('#url').val();
+        let sourceId = $('.board-form').find('#source_id').val();
+        let author = $('.board-form').find('#author').val();
+        let title = $('.board-form').find('#title').val();
+        let description = $('.board-form').find('#description').val();
+        let imgURL = $('.board-form').find('#img_url').val();
+        let publishedAt = $('.board-form').find('#published_at').val();
+        let content = $('.board-form').find('#content').val();
+        let boardId = $('.board-form').find('#board_id').val();
+        let feedId = $('.board-form').find('#feed_id').val(); // for specific feed
+
+        await axios.post(`${REQ_URL}/feeds/${feedId}`, {
+                url: url,
+                source_id: sourceId,
+                author: author,
+                title: title,
+                description: description,
+                img_url: imgURL,
+                published_at: publishedAt,
+                content: content,
+                board_id: boardId
+            })
+            .then(function(response) {
+                location.reload();
+            })
+            .catch(function(error) {
+                console.log(error);
+            });
+    });
+
+    $(document).on('click', '.submit-board-headlines', async function(e) {
+
+        e.preventDefault();
+        let url = $('.board-form').find('#url').val();
+        let sourceId = $('.board-form').find('#source_id').val();
+        let author = $('.board-form').find('#author').val();
+        let title = $('.board-form').find('#title').val();
+        let description = $('.board-form').find('#description').val();
+        let imgURL = $('.board-form').find('#img_url').val();
+        let publishedAt = $('.board-form').find('#published_at').val();
+        let content = $('.board-form').find('#content').val();
+        let boardId = $('.board-form').find('#board_id').val();
 
         await axios.post(`${REQ_URL}/headlines`, {
                 url: url,
@@ -115,11 +177,7 @@ $(document).ready(function() {
         let imgURL = $('.board-form').find('#img_url').val();
         let publishedAt = $('.board-form').find('#published_at').val();
         let content = $('.board-form').find('#content').val();
-
         let boardId = $('.board-form').find('#board_id').val();
-
-        // feedId- is used to get article from specific feed
-        let feedId = $('.board-form').find('#feed_id').val();
 
         await axios.post(`${REQ_URL}/search`, {
                 url: url,

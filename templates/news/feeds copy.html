@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+ {% block title %} Feeds {% endblock %}
+ 
+ {% block content %}
+
+<div class="content">
+    <h4>{{ feed_name }} - headlines</h4>
+</div>
+
+{% include "_articles.html" %} 
+
+<br>
+<div class="row justify-content-lg-center">
+    {% for page_num in pagination.pages %}
+        {% if page_num %}
+            {% if pagination.page == page_num %}
+                <a class="btn btn-primary mb-4 margin-left" href=
+                "{{ url_for('feed_news', id=feed_id, page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-primary mb-4 margin-left" href=
+                "{{ url_for('feed_news', id=feed_id, page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% endblock %}
