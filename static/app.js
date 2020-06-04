@@ -84,9 +84,7 @@ $(document).ready(function() {
         // feedId- is used to get article from specific feed
         let feedId = $('.board-form').find('#feed_id').val();
 
-        let currentURL = $(location).attr('href');
-
-        console.log("print this: ", currentURL)
+        let currentURL = $(window.location).attr('href');
 
         if (currentURL.indexOf(`${REQ_URL}/categories`) > -1) {
             makeRequest(`${REQ_URL}/categories`);
@@ -118,7 +116,7 @@ $(document).ready(function() {
                 })
                 .then(function(response) {
 
-                    document.location.reload(true);
+                    location.reload();
 
                     console.log(response);
                 })
