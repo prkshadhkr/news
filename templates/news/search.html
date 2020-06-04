@@ -35,7 +35,73 @@
 
 </form>
 
-{% include "_articles.html" %} 
+{% for data in news %}
+
+<ul class="list-unstyled">
+    <li class="media">
+      
+        <a href="{{data['url']}}" target="_blank">
+            <img src="{{ data['urlToImage'] }}" class="rounded d-flex mr-3" alt="..." target="_blank">
+        </a>
+
+        <div class="media-body">
+            <div class="mt-0 font-weight-bold">
+                <a href="{{data['url']}}" target="_blank">
+                    <h6>{{ data['title'] }}</h6>
+                </a>
+                <small class="text-muted">{{ data['publishedAt'] }}</small>
+            </div>
+            <p>{{ data['description'] }}</p>
+            <small class="text-muted">{{ data['author'] }}</small>
+        </div>
+        <span class="">
+          <div class="col-sm-2">
+
+                {% if g.user %}
+                <button type="button" class="btn btn-sm btn-outline-info" data-placement="top" data-toggle="popover" data-html='true' data-content="
+                    <div class='text-center'>
+                        <h6>Add to Board</h6>
+                    </div>
+                    <form class='board-form'>
+                      <input type='hidden' id='feed_id' value='{{ feed_id }}'>
+                      <input type='hidden' id='url' value='{{ data['url'] }}'>
+                      <input type='hidden' id='source_id' value='{{ data['source']['id'] }}'> 
+                      <input type='hidden' id='author' value='{{ data['author'] }}'> 
+                      <input type='hidden' id='title' value='{{ data['title'] }}'> 
+                      <input type='hidden' id='description' value='{{ data['description'] }}'> 
+                      <input type='hidden' id='img_url' value='{{ data['urlToImage'] }}'> 
+                      <input type='hidden' id='published_at' value='{{ data['publishedAt'] }}'>   
+                      <input type='hidden' id='content' value='{{ data['content'] }}'> 
+                      <label for='board_id'></label>
+                      <select id='board_id'class='custom-select' multiple>
+                          {% for board in boards %}
+
+                              <option value='{{board['id']}}' 
+                              {% if (board['id'], data['url']) not in article_boards %}
+                                  enabled
+                              {% else %}
+                                  disabled style='background-color:yellow'
+                              {% endif %}
+                              >{{board['name']}}</option>
+
+                          {% endfor %}
+                      </select>
+                      <p></p>
+                      <div align='center'>
+                          <button class='submit-board-search btn btn-sm btn-outline-success'>Submit</button>
+                      </div>
+                      
+                    </form>
+                    ">Add
+                </button>
+                {% endif %}
+                
+          </div>
+      </span>
+    </li>
+</ul>
+
+{% endfor %}
 
 <br>
 {% if search_type == "general" %}
