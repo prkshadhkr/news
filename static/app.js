@@ -67,7 +67,7 @@ $(document).ready(function() {
 /*************************** Boards ****************************/
 
 $(document).ready(function() {
-    $(document).on('click', '.submit-board', async function(e) {
+    $(document).on('click', '.submit-board', function(e) {
 
         e.preventDefault();
         let url = $('.board-form').find('#url').val();
@@ -84,7 +84,7 @@ $(document).ready(function() {
         // feedId- is used to get article from specific feed
         let feedId = $('.board-form').find('#feed_id').val();
 
-        await axios.post(`${REQ_URL}/headlines`, {
+        axios.post(`${REQ_URL}/headlines`, {
                 url: url,
                 source_id: sourceId,
                 author: author,
@@ -96,7 +96,8 @@ $(document).ready(function() {
                 board_id: boardId
             })
             .then(function(response) {
-                location.reload();
+                // location.reload();
+                location.href = location.href;
                 console.log(response);
             })
             .catch(function(error) {
