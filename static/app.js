@@ -116,7 +116,7 @@ $(document).ready(function() {
                 })
                 .then(function(response) {
 
-                    window.location.reload();
+                    document.location.reload(true);
 
                     console.log(response);
                 })
