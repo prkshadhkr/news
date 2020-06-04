@@ -1,4 +1,4 @@
-const REQ_URL = `http://${location.host}`;
+const REQ_URL = `https://${location.host}`;
 
 
 //*************** side navbar scripts: *****************//
