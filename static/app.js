@@ -86,6 +86,8 @@ $(document).ready(function() {
 
         let currentURL = $(location).attr('href');
 
+        console.log("print this: ", currentURL)
+
         if (currentURL.indexOf(`${REQ_URL}/categories`) > -1) {
             makeRequest(`${REQ_URL}/categories`);
         }
