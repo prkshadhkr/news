@@ -68,7 +68,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
 
-    $(document).on('click', '.submit-board', function(e) {
+    $(document).on('click', '.submit-board', async function(e) {
 
         e.preventDefault();
         let url = $('.board-form').find('#url').val();
@@ -86,7 +86,7 @@ $(document).ready(function() {
         let feedId = $('.board-form').find('#feed_id').val();
 
 
-        axios.post(`${REQ_URL}/headlines`, {
+        await axios.post(`${REQ_URL}/headlines`, {
                 url: url,
                 source_id: sourceId,
                 author: author,
