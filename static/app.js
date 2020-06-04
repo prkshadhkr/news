@@ -44,7 +44,7 @@ $(document).on('click', function(e) {
 $(document).ready(function() {
     $(document).on('click', '.submit-feed', async function(e) {
 
-        // e.preventDefault();
+        e.preventDefault();
         let sourceId = $('.feed-form').find('#source_id').val();
         let feedId = $('.feed-form').find('#feed_id').val();
 
@@ -70,7 +70,7 @@ $(document).ready(function() {
 
     $(document).on('click', '.submit-board', function(e) {
 
-        e.preventDefault();
+        // e.preventDefault();
         let url = $('.board-form').find('#url').val();
         let sourceId = $('.board-form').find('#source_id').val();
         let author = $('.board-form').find('#author').val();
