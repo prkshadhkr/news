@@ -48,7 +48,7 @@ $(document).ready(function() {
         let sourceId = $('.feed-form').find('#source_id').val();
         let feedId = $('.feed-form').find('#feed_id').val();
 
-        console.log('*****************', REQ_URL)
+
         await axios.post(`${REQ_URL}/sources`, {
                 source_id: sourceId,
                 feed_id: feedId
@@ -83,6 +83,8 @@ $(document).ready(function() {
 
         // feedId- is used to get article from specific feed
         let feedId = $('.board-form').find('#feed_id').val();
+
+        console.log('*****************', REQ_URL)
 
         await axios.post(`${REQ_URL}/headlines`, {
                 url: url,
