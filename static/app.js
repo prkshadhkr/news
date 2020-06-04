@@ -99,7 +99,9 @@ $(document).ready(function() {
                 console.log(error);
             });
     });
+});
 
+$(document).ready(function() {
 
     $(document).on('click', '.submit-board-feeds', async function(e) {
 
@@ -133,7 +135,9 @@ $(document).ready(function() {
                 console.log(error);
             });
     });
+});
 
+$(document).ready(function() {
     $(document).on('click', '.submit-board-headlines', async function(e) {
 
         e.preventDefault();
@@ -165,7 +169,9 @@ $(document).ready(function() {
                 console.log(error);
             });
     });
+});
 
+$(document).ready(function() {
     $(document).on('click', '.submit-board-search', async function(e) {
 
         e.preventDefault();
