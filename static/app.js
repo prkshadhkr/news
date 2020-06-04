@@ -67,7 +67,7 @@ $(document).ready(function() {
 /*************************** Boards ****************************/
 
 $(document).ready(function() {
-    $(document).on('submit', '.submit-board', async function(e) {
+    $('.submit-board').submit(async function(e) {
 
         e.preventDefault();
         let url = $('.board-form').find('#url').val();
