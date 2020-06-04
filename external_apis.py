@@ -1,5 +1,5 @@
 from constants import  BASE_URL
-from secrets import API_KEY   #make sure get you API key from newsapi.org
+from secrets import API_KEY   #make sure get your API key from "newsapi.org"
 import requests
 
 ################## External API calls #######################
