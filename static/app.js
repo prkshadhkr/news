@@ -84,7 +84,8 @@ $(document).ready(function() {
         // feedId- is used to get article from specific feed
         let feedId = $('.board-form').find('#feed_id').val();
 
-        let currentURL = $(window.location).attr('href');
+        // let currentURL = $(location).attr('href');
+        let currentURL = window.location.href;
 
         if (currentURL.indexOf(`${REQ_URL}/categories`) > -1) {
             makeRequest(`${REQ_URL}/categories`);
