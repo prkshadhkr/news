@@ -115,8 +115,8 @@ $(document).ready(function() {
                     board_id: boardId
                 })
                 .then(function(response) {
-                    // location.reload();
-                    window.location.href = window.location.href;
+                    location.reload(true);
+                    // window.location.href = window.location.href;
                     console.log(response);
                 })
                 .catch(function(error) {
