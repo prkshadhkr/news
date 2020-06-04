@@ -1,4 +1,4 @@
-const REQ_URL = `http://${location.host}`;
+const REQ_URL = `https://${location.host}`;
 
 
 //*************** side navbar scripts: *****************//
@@ -115,7 +115,8 @@ $(document).ready(function() {
                     board_id: boardId
                 })
                 .then(function(response) {
-                    location.reload();
+                    // location.reload();
+                    window.location.href = window.location.href;
                     console.log(response);
                 })
                 .catch(function(error) {
