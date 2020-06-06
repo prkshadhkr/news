@@ -3,7 +3,7 @@ Link to docs:
 https://drive.google.com/open?id=1qVu5DfyyM_6Z0pZumnWEhNMLXVaeqsjP
 
 Link to web page:
-https://news-only.herokuapp.com/
+**[news-only](https://news-only.herokuapp.com)**
 
 ### How to use news-only:
 
