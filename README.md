@@ -38,16 +38,10 @@ users have chosen while signup.
 	Also this page lets users to add the news outlet into their feeds. 
 	
 ### Feed:
-	In this page users could create feed where they could add news outlets of their choices from 
-	source page. This page also allows users to remove news outlets and feed itself if they do not like
-	them. Moreover, it also has a link for each feed where users could see the news only from selected news
-	outlets that they have selected from source page.
+	In this page users could create feed where they could add news outlets of their choices from source page. This page also allows 	users to remove news outlets and feed itself if they do not like them. Moreover, it also has a link for each feed where users 		could see the news only from selected news outlets that they have selected from source page.
 	
 ### Board:
-	In this page users could create board where they could store articles if they are interested in future
-	read. This page also shows the highlights of the articles that belong to corresponding boards. 
-	Here users have ability to delete the board. Moreover, it has links to specific
-	board where users could see the articles they have stored. 
+	In this page users could create board where they could store articles if they are interested in future read. This page also 	shows the highlights of the articles that belong to corresponding boards. Here users have ability to delete the board. Moreover, it has links to specific board where users could see the articles they have stored. 
 	
 	In specific board page users could check, uncheck and delete the articles.
 
