@@ -56,8 +56,8 @@ they have created.
 
 ## Improvements:
 	1. Add buttons are visible eventhough users do not have feed/board. 
-	2. Everytime when user add source in feed and article in board page refreshes.
-	We could imporove this by using axios response back to update the portion of page without refreshing a whole page.
+	2. Everytime when user add source in feed and article in board page refreshes. We could imporove this
+		by using axios response back to update the portion of page without refreshing a whole page.
 	3. All articles are showing in same layout. We could add features to let users to select different layouts.
 	4. Add toggle button to switch dark and light mode.
 
