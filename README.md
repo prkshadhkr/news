@@ -7,18 +7,18 @@ https://news-only.herokuapp.com/
 
 ### How to use news-only:
 
-## Developers:<br>
-	1. Clone the project.<br>
-	2. In app.py:<br>
-	 	Commentout lines: 21, 22 and 29.<br>
-	 	Uncomment lines: 23 and 30
-	3. In external_apis.py:<br>
-	 	Commentout line: 5<br>
+## Developers:
+	1. Clone the project.
+	2. In app.py:
+	 	Commentout lines: 21, 22 and 29.
+	 	Uncomment lines: 23 and 30.
+	3. In external_apis.py:
+	 	Commentout line: 5
 	 	Uncomment line: 6 and use your API_KEY
 
 	Note: visit https://newsapi.org/ to get your API_KEY 
 
-## Users:<br>
+## Users:
 After successful signup or login users will see news headlines from the country that
 users have chosen while signup.
 
@@ -57,7 +57,7 @@ they have created.
 ## Improvements:
 	1. Add buttons are visible eventhough users do not have feed/board. 
 	2. Everytime when user add source in feed and article in board page refreshes.
-		We could imporove this by using axios response back to update the portion of page without refreshing a whole page.
+	We could imporove this by using axios response back to update the portion of page without refreshing a whole page.
 	3. All articles are showing in same layout. We could add features to let users to select different layouts.
 	4. Add toggle button to switch dark and light mode.
 
