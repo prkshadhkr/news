@@ -16,10 +16,10 @@ https://news-only.herokuapp.com/
 	 	Commentout line: 5
 	 	Uncomment line: 6 and use your API_KEY
 
-	Note: visit https://newsapi.org/ to get your API_KEY 
+	Note: visit <https://newsapi.org> to get your API_KEY 
 
 ## Users:
-After successful signup or login users will see news headlines from the country that
+After successful signup or login, users will see news headlines from the country that
 users have chosen while signup.
 
 ### Search: 
