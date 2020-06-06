@@ -25,7 +25,7 @@ users have chosen while signup.
 ### Search: 
 	i. Generic search
 		This will be available for users as long as users are logged in. So users could search 
-		content anytime as this functionality is avialable on top of the navigation bar.
+		content anytime as this functionality is avialable in top navigation bar.
 	ii. Time based search:
 		This allows users to search specific news based on time. 
 		It will let users to get articles as old as a month.
@@ -33,14 +33,14 @@ users have chosen while signup.
 ### Categories:
 	In this page users have ability to explore news based on country and categories.
 
-### Source:
+### Sources:
 	It has 128 differnt news outlets where users could navigate directly into their webpages.
 	Also this page lets users to add the news outlet into their feeds. 
 	
 ### Feed:
 	In this page users could create feed where they could add news outlets of their choices from 
 	source page. This page also allows users to remove news outlets and feed itself if they do not like
-	them. Moreover, it also has a link for each feed where users could see the news from selected news
+	them. Moreover, it also has a link for each feed where users could see the news only from selected news
 	outlets that they have selected from source page.
 	
 ### Board:
